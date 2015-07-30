@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/*
 // @include http://www.forumjv.com/forums/*
-// @version 4.8.1
+// @version 4.8.2
 // ==/UserScript==
 
 // Compatibilité Google Chrome & Opera
@@ -17,11 +17,11 @@ function wrapper() {
 var urlToLoad = '';
 var isOnLastPage = true, isTabActive = true, isLoading = false, shouldReload = false;
 var lastPost = -1, newPosts = 0, idanalyse = -1;
+var instance = 0;
 var son = chargerSon();
 var favicon = new Image();
 var lienFavicon = null;
 favicon.src = "http://www.jeuxvideo.com/favicon.ico";
-var mps = [];
 var editions = {};
 
 /**
@@ -185,7 +185,7 @@ function processPage($data) {
 	isLoading = false;
 	if(shouldReload) {
 		shouldReload = false;
-		obtenirPage();
+		obtenirPage(processPage);
 	} else chargementPropre();
 }
 
@@ -272,72 +272,26 @@ function updatePost($oldPost, $newPost)
 /**
  * Telecharge la page d'URL urlToLoad
  */
-function obtenirPage() {
-
-	var localId = idanalyse;
-
-	if(isLoading) {
-		shouldReload = true;
-		return;
-	}
-
-	isLoading = true;
-
+function obtenirPage(cb)
+{
+	var lInstance = instance;
+	
 	$.ajax({
 		url: urlToLoad,
 		dataType: 'text',
 		type: 'GET',
-		success: function(data){
-			if(idanalyse == localId)
-				try {
-					if(document.URL.indexOf("/messages-prives/") == -1)
-						processPage($(data));
-					else
-						processMPs($(data));
-				} catch(e) {
-					console.log("[TopicLive] processPage : " + e);
-				}
-	}});
-}
-
-function processMPs($page)
-{
-	// Mise a jour du formulaire TODO
-
-	// Anti-expiration de la page
-	$("#ajax_timestamp_liste_messages").val($data.find("#ajax_timestamp_liste_messages").val());
-	$("#ajax_hash_liste_messages").val($data.find("#ajax_hash_liste_messages").val());
-	
-	// Ajout des nouveaux messages a la page
-	$data.find(".bloc-message-forum").each(function(){
-		try {
-			ajouterPost($(this));
-		} catch(e) {
-			console.log("[TopicLive] ajouterPost : " + e);
+		success: function(data)
+		{
+			if(lInstance == instance)
+			{
+					cb($(data));
+			}
+			else
+			{
+				console.log('[TopicLive] Nouvelle instance detectee : arret du chargement');
+			}
 		}
 	});
-
-	// Fix des spoilers
-	replace_spoil();
-
-	// Fix des liens (automatique via jvcare)
-	jsli.Transformation();
-
-	dispatchEvent(new CustomEvent("topiclive:doneprocessing", {
-		'detail': {
-			jvcake: jvCake
-		}
-	}));
-	
-	// Changement de la favicon en cas de nouveaux messages
-	if(!isTabActive && newPosts > 0) setFavicon("" + newPosts);
-
-	// Anti-doublons
-	isLoading = false;
-	if(shouldReload) {
-		shouldReload = false;
-		obtenirPage();
-	} else chargementPropre();
 }
 
 /**
@@ -494,7 +448,7 @@ function postRespawn($newForm) {
 		success: function(data){
 			var $data = $(data);
 			majFormulaire($data, true);
-			obtenirPage();
+			obtenirPage(processPage);
 			
 			$formulaire.find('.btn-poster-msg').removeAttr("disabled");
 			$("#message_topic").val("");
@@ -505,7 +459,9 @@ function postRespawn($newForm) {
 
 function chargementPropre() {
 	window.clearTimeout(idanalyse);
-	idanalyse = setTimeout(obtenirPage, isTabActive ? 1000 : 10000);
+	idanalyse = setTimeout(function(){
+		obtenirPage(processPage);
+	}, isTabActive ? 1000 : 10000);
 }
 
 /**
@@ -590,21 +546,7 @@ fixChromeHack();
 function main() {
 
 	console.log("[TopicLive] Script charge.");
-
-	// MP
-	if($(".bloc-message-forum").length > 0) {
-
-		mps = [];
-		newPosts = 0;
-		formData = {};
-		isTabActive = true;
-		urlToLoad = document.URL;
-
-		registerTabs();
-		setFavicon("");
-		chargementPropre();
-
-	}
+	instance++;
 	
 	// Topic
 	if($('.conteneur-message').length > 0) {
