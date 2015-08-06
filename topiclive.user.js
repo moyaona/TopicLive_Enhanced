@@ -18,7 +18,7 @@ var urlToLoad = '';
 var isOnLastPage = true, isTabActive = true, isLoading = false, shouldReload = false;
 var lastPost = -1, newPosts = 0, idanalyse = -1;
 var instance = 0;
-var son = chargerSon();
+var son = new Audio('http://kiwec.net/files/topiclive.ogg');
 var favicon = new Image();
 var lienFavicon = null;
 favicon.src = '/favicon.ico';
@@ -45,69 +45,6 @@ function ajouterOption()
 		$("#topiclive_activerson").attr("class", "interrupteur-inline pointer");
 		$("#topiclive_desactiverson").attr("class", "interrupteur-inline actif");
 	});
-}
-
-/**
- * Charge le son de nouveau message
- * Telecharge le son lors du premier lancement
- */
-function chargerSon()
-{
-	// Caching manuel du son, merci aux navigateurs "modernes"
-	if(localStorage.getItem('topiclive_son_bin') === null)
-	{
-		try {
-			// localStorage = string uniquement
-			var xhr = new XMLHttpRequest();
-			xhr.open('GET', 'http://kiwec.net/files/topiclive.ogg', true);
-			xhr.overrideMimeType('text/plain; charset=x-user-defined');
-			xhr.onreadystatechange = function(e){
-				if(xhr.readyState == 4 && xhr.status == 200)
-				{
-					localStorage['topiclive_son_bin'] = base64Encode(xhr.responseText);
-					console.log('[TopicLive] Son ajoute en localstorage.');
-					return new Audio('data:audio/ogg;base64,' + localStorage['topiclive_son_bin']);
-				}
-			};
-			xhr.send(null);
-		} catch(e){}
-	}
-	else return new Audio('data:audio/ogg;base64,' + localStorage['topiclive_son_bin']);
-}
-
-/**
- * Fonction utilisee par chargerSon() pour stocker le son dans localStorage
- */
-function base64Encode(str)
-{
-	var CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	var out = "", i = 0, len = str.length, c1, c2, c3;
-	
-	while (i < len)
-	{
-		c1 = str.charCodeAt(i++) & 0xff;
-		if (i == len) {
-			out += CHARS.charAt(c1 >> 2);
-			out += CHARS.charAt((c1 & 0x3) << 4);
-			out += "==";
-			break;
-		}
-		c2 = str.charCodeAt(i++);
-		if (i == len) {
-			out += CHARS.charAt(c1 >> 2);
-			out += CHARS.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
-			out += CHARS.charAt((c2 & 0xF) << 2);
-			out += "=";
-			break;
-		}
-		c3 = str.charCodeAt(i++);
-		out += CHARS.charAt(c1 >> 2);
-		out += CHARS.charAt(((c1 & 0x3) << 4) | ((c2 & 0xF0) >> 4));
-		out += CHARS.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >> 6));
-		out += CHARS.charAt(c3 & 0x3F);
-	}
-	
-	return out;
 }
 
 function getLastPage($boutonFin)
@@ -217,8 +154,10 @@ function ajouterPost($post)
 				jvcake: jvCake
 			}
 		}));
-				
-		if(localStorage['topiclive_son'] == 'bru') son.play();
+		
+		if(localStorage['topiclive_son'] == 'bru' && shouldReload == false) son.play();
+
+		shouldReload = false;
 	}
 	else
 	{
@@ -550,11 +489,6 @@ function main() {
 
 	console.log("[TopicLive] Script charge.");
 	instance++;
-	
-	addEventListener('topiclive:newmessage', function()
-	{
-		shouldReload = false;
-	});
 	
 	// Topic
 	if($('.conteneur-message').length > 0) {
