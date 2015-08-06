@@ -184,7 +184,6 @@ function processPage($data) {
 	// Anti-doublons
 	isLoading = false;
 	if(shouldReload) {
-		shouldReload = false;
 		obtenirPage(processPage);
 	} else chargementPropre();
 }
@@ -547,6 +546,11 @@ function main() {
 
 	console.log("[TopicLive] Script charge.");
 	instance++;
+	
+	addEventListener('topiclive:newmessage', function()
+	{
+		shouldReload = false;
+	});
 	
 	// Topic
 	if($('.conteneur-message').length > 0) {
