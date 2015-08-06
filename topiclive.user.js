@@ -184,6 +184,7 @@ function processPage($data) {
 	// Anti-doublons
 	isLoading = false;
 	if(shouldReload) {
+		console.log('[TopicLive] Chargement de page (shouldReload)');
 		obtenirPage(processPage);
 	} else chargementPropre();
 }
@@ -447,6 +448,8 @@ function postRespawn($newForm) {
 		success: function(data){
 			var $data = $(data);
 			majFormulaire($data, true);
+			console.log('[TopicLive] Chargement de page (postRespawn)');
+			shouldReload = true;
 			obtenirPage(processPage);
 			
 			$formulaire.find('.btn-poster-msg').removeAttr("disabled");
@@ -459,6 +462,7 @@ function postRespawn($newForm) {
 function chargementPropre() {
 	window.clearTimeout(idanalyse);
 	idanalyse = setTimeout(function(){
+		console.log('[TopicLive] Chargement de page (chargementAuto)');
 		obtenirPage(processPage);
 	}, isTabActive ? 1000 : 10000);
 }
