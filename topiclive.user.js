@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/*
 // @include http://www.forumjv.com/forums/*
-// @version 4.8.2
+// @version 4.8.2-dev
 // ==/UserScript==
 
 // Compatibilité Google Chrome & Opera
@@ -21,7 +21,7 @@ var instance = 0;
 var son = chargerSon();
 var favicon = new Image();
 var lienFavicon = null;
-favicon.src = "http://www.jeuxvideo.com/favicon.ico";
+favicon.src = '/favicon.ico';
 var editions = {};
 
 /**
