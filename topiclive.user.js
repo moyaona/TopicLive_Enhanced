@@ -1,9 +1,11 @@
 // ==UserScript==
 // @name TopicLive
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
-// @include http://www.jeuxvideo.com/*
+// @include http://www.jeuxvideo.com/forums/*
 // @include http://www.forumjv.com/forums/*
 // @version 4.8.2-dev
+// @grant GM_addStyle
+// @grant GM_xmlhttpRequest
 // ==/UserScript==
 
 // Compatibilité Google Chrome & Opera
@@ -15,7 +17,7 @@ script.parentNode.removeChild(script);
 function wrapper() {
 
 var urlToLoad = '';
-var isOnLastPage = true, isTabActive = true, isLoading = false, shouldReload = false;
+var isOnLastPage = true, isTabActive = true, shouldReload = false;
 var lastPost = -1, newPosts = 0, idanalyse = -1;
 var instance = 0;
 var son = new Audio('http://kiwec.net/files/topiclive.ogg');
@@ -118,8 +120,6 @@ function processPage($data) {
 	// Changement de la favicon en cas de nouveaux messages
 	if(!isTabActive && newPosts > 0) setFavicon("" + newPosts);
 
-	// Anti-doublons
-	isLoading = false;
 	if(shouldReload) {
 		console.log('[TopicLive] Chargement de page (shouldReload)');
 		obtenirPage(processPage);
@@ -214,6 +214,8 @@ function updatePost($oldPost, $newPost)
 function obtenirPage(cb)
 {
 	var lInstance = instance;
+
+	$('.bloc-header-form').text('Répondre ◌');
 	
 	$.ajax({
 		url: urlToLoad,
@@ -223,7 +225,13 @@ function obtenirPage(cb)
 		{
 			if(lInstance == instance)
 			{
-					cb($(data));
+				cb($(data));
+
+				$('.bloc-header-form').text('Répondre ●');
+				setTimeout(function()
+				{
+					$('.bloc-header-form').text('Répondre');
+				}, 100)
 			}
 			else
 			{
@@ -401,9 +409,9 @@ function postRespawn($newForm) {
 function chargementPropre() {
 	window.clearTimeout(idanalyse);
 	idanalyse = setTimeout(function(){
-		console.log('[TopicLive] Chargement de page (chargementAuto)');
+		console.log('[TopicLive] Chargement de page (chargementAuto) ' + idanalyse);
 		obtenirPage(processPage);
-	}, isTabActive ? 1000 : 10000);
+	}, isTabActive ? 5000 : 10000);
 }
 
 /**
