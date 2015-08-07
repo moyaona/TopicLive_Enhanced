@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/forums/*
 // @include http://www.forumjv.com/forums/*
-// @version 4.8.5
+// @version 4.8.6-dev
 // @grant GM_addStyle
 // @grant GM_xmlhttpRequest
 // ==/UserScript==
@@ -225,7 +225,23 @@ function obtenirPage(cb)
 		{
 			if(lInstance == instance)
 			{
-				cb($(data));
+				try
+				{
+					cb($(data));
+				}
+				catch(e)
+				{
+					console.log('[TopicLive] Erreur de parsing :(');
+
+					try
+					{
+						cb($(data.substring(124)));
+					}
+					catch(e)
+					{
+						console.log('[TopicLive] Erreur de parsing :( chargement impossible');
+					}
+				}
 
 				$('.bloc-header-form').text('Répondre ●');
 				setTimeout(function()
