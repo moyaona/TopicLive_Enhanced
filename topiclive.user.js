@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/forums/*
 // @include http://www.forumjv.com/forums/*
-// @version 4.8.4
+// @version 4.8.5
 // @grant GM_addStyle
 // @grant GM_xmlhttpRequest
 // ==/UserScript==
@@ -235,7 +235,7 @@ function obtenirPage(cb)
 			}
 			else
 			{
-				console.log('[TopicLive] Nouvelle instance detectee : arret du chargement');
+				console.log('[TopicLive] Nouvelle instance detectee : arret du chargement de la page');
 			}
 		},
 		error: function()
@@ -370,7 +370,7 @@ function majFormulaire($page, majCaptcha)
 			error: function()
 			{
 				modal('erreur', {
-					message: 'Erreur inconnue lors de la vérification du message.'
+					message: 'Erreur lors de la vérification du message.'
 				});
 			}
 		});
@@ -424,9 +424,13 @@ function postRespawn($newForm) {
 
 function chargementPropre() {
 	window.clearTimeout(idanalyse);
+	var lInstance = instance;
 	idanalyse = setTimeout(function(){
-		console.log('[TopicLive] Chargement de page (chargementAuto) ' + idanalyse);
-		obtenirPage(processPage);
+		//console.log('[TopicLive] Chargement de page (chargementAuto) ' + idanalyse);
+		if(lInstance == instance)
+			obtenirPage(processPage);
+		else
+			console.log('[TopicLive] Nouvelle instance detectee : arret de chargementAuto');
 	}, isTabActive ? 5000 : 10000);
 }
 
