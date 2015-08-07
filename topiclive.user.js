@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/forums/*
 // @include http://www.forumjv.com/forums/*
-// @version 4.8.3
+// @version 4.8.3-dev
 // @grant GM_addStyle
 // @grant GM_xmlhttpRequest
 // ==/UserScript==
@@ -215,7 +215,7 @@ function obtenirPage(cb)
 {
 	var lInstance = instance;
 
-	$('.bloc-header-form').text('Répondre ◌');
+	$('.bloc-header-form').text('Répondre ○');
 	
 	$.ajax({
 		url: urlToLoad,
@@ -237,6 +237,11 @@ function obtenirPage(cb)
 			{
 				console.log('[TopicLive] Nouvelle instance detectee : arret du chargement');
 			}
+		},
+		error: function()
+		{
+			console.log('[TopicLive] Erreur lors du chargement de la page.')
+			obtenirPage(cb);
 		}
 	});
 }
@@ -361,6 +366,12 @@ function majFormulaire($page, majCaptcha)
 					// Si il n'y a pas d'erreurs
 					postRespawn($newForm);
 				}
+			},
+			error: function()
+			{
+				modal('erreur', {
+					message: 'Erreur inconnue lors de la vérification du message.'
+				});
 			}
 		});
 	
@@ -402,6 +413,11 @@ function postRespawn($newForm) {
 			$formulaire.find('.btn-poster-msg').removeAttr("disabled");
 			$("#message_topic").val("");
 			$formulaire.find('.conteneur-editor').fadeIn();
+		},
+		error: function()
+		{
+			console.log('[TopicLive] Erreur lors de l\'envoi d\'un message');
+			postRespawn($newForm);
 		}
 	});
 }
