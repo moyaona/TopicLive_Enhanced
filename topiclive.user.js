@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/forums/*
 // @include http://www.forumjv.com/forums/*
-// @version 4.8.2-dev
+// @version 4.8.3
 // @grant GM_addStyle
 // @grant GM_xmlhttpRequest
 // ==/UserScript==
