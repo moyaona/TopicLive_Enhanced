@@ -214,53 +214,48 @@ function obtenirPage(cb)
 	var lInstance = instance;
 
 	$('.bloc-header-form').text('Répondre ○');
-
-	GM_xmlhttpRequest({
-		method: 'GET',
+	
+	$.ajax({
 		url: urlToLoad,
-		onload: function(res)
+		dataType: 'text',
+		type: 'GET',
+		success: function(data)
 		{
-			if(res.status == 200)
+			if(lInstance == instance)
 			{
-				if(lInstance == instance)
+				try
 				{
+					cb($(data));
+				}
+				catch(e)
+				{
+					console.log('[TopicLive] Erreur de parsing :(');
+
 					try
 					{
-						cb($(data));
+						cb($(data.substring(124)));
 					}
 					catch(e)
 					{
-						console.log('[TopicLive] Erreur de parsing :(');
-
-						try
-						{
-							cb($(data.substring(124)));
-						}
-						catch(e)
-						{
-							console.log('[TopicLive] Erreur de parsing :( chargement impossible');
-						}
+						console.log('[TopicLive] Erreur de parsing :( chargement impossible');
 					}
+				}
 
-					$('.bloc-header-form').text('Répondre ●');
-					setTimeout(function()
-					{
-						$('.bloc-header-form').text('Répondre');
-					}, 100)
-				}
-				else
+				$('.bloc-header-form').text('Répondre ●');
+				setTimeout(function()
 				{
-					console.log('[TopicLive] Nouvelle instance detectee : arret du chargement de la page');
-				}
+					$('.bloc-header-form').text('Répondre');
+				}, 100)
 			}
 			else
 			{
-				console.log('[TopicLive] Erreur ' + res.status + ' lors du chargement');
-				setTimeout(function()
-				{
-					obtenirPage(cb);
-				}, 100);
+				console.log('[TopicLive] Nouvelle instance detectee : arret du chargement de la page');
 			}
+		},
+		error: function()
+		{
+			console.log('[TopicLive] Erreur lors du chargement de la page.')
+			obtenirPage(cb);
 		}
 	});
 }
