@@ -29,32 +29,46 @@ var editions = {};
  */
 function ajouterOption()
 {
-	var actif = localStorage['topiclive_son'] == 'bru' ? true : false;
-	$(".menu-user-forum").append("<li><span class=\"pull-left\">Son TopicLive</span>"
-		+ "<span class=\"interrupteur-inline " + (actif ? "actif" : "pointer") + " forum_son_topiclive\" id=\"topiclive_activerson\">OUI</span>"
-		+ "<span class=\"interrupteur-inline " + (actif ? "pointer" : "actif") + " forum_son_topiclive\" id=\"topiclive_desactiverson\">NON</span></li>");
+	try
+	{
+		var actif = localStorage['topiclive_son'] == 'bru' ? true : false;
+		$(".menu-user-forum").append("<li><span class=\"pull-left\">Son TopicLive</span>"
+			+ "<span class=\"interrupteur-inline " + (actif ? "actif" : "pointer") + " forum_son_topiclive\" id=\"topiclive_activerson\">OUI</span>"
+			+ "<span class=\"interrupteur-inline " + (actif ? "pointer" : "actif") + " forum_son_topiclive\" id=\"topiclive_desactiverson\">NON</span></li>");
 
-	$("#topiclive_activerson").on("click", function(){
-		localStorage["topiclive_son"] = "bru";
-		$("#topiclive_activerson").attr("class", "interrupteur-inline actif");
-		$("#topiclive_desactiverson").attr("class", "interrupteur-inline pointer");
-	});
-	
-	$("#topiclive_desactiverson").on("click", function(){
-		localStorage["topiclive_son"] = "sil";
-		$("#topiclive_activerson").attr("class", "interrupteur-inline pointer");
-		$("#topiclive_desactiverson").attr("class", "interrupteur-inline actif");
-	});
+		$("#topiclive_activerson").on("click", function(){
+			localStorage["topiclive_son"] = "bru";
+			$("#topiclive_activerson").attr("class", "interrupteur-inline actif");
+			$("#topiclive_desactiverson").attr("class", "interrupteur-inline pointer");
+		});
+		
+		$("#topiclive_desactiverson").on("click", function(){
+			localStorage["topiclive_son"] = "sil";
+			$("#topiclive_activerson").attr("class", "interrupteur-inline pointer");
+			$("#topiclive_desactiverson").attr("class", "interrupteur-inline actif");
+		});
+	}
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur ajouterOption : ' + e);
+	}
 }
 
 function getLastPage($boutonFin)
 {
-	if($boutonFin.length > 0)
+	try
 	{
-		if($boutonFin.prop("tagName") == "A")
-			urlToLoad = $boutonFin.attr("href");
-		else
-			urlToLoad = jvCake($boutonFin.attr("class"));
+		if($boutonFin.length > 0)
+		{
+			if($boutonFin.prop("tagName") == "A")
+				urlToLoad = $boutonFin.attr("href");
+			else
+				urlToLoad = jvCake($boutonFin.attr("class"));
+		}
+	}
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur getLastPage : ' + e);
 	}
 }
 
@@ -63,65 +77,56 @@ function getLastPage($boutonFin)
  */
 function processPage($data) {
 
-	// Mise a jour du formulaire
-	try {
+	try
+	{
+		// Mise a jour du formulaire
 		majFormulaire($data);
-	} catch(e) {
-		console.log('[TopicLive] processPage>majFormulaire :', e);
-	}
 
-	// Mise a jour du numero de dernier post
-	try {
+		// Mise a jour du numero de dernier post
 		if(lastPost == -1)
 			lastPost = parseInt($data.find('.bloc-message-forum:last').attr('data-id'),10);
-	} catch(e) {
-		console.log('[TopicLive] processPage>lastPost :', e);
-	}
 
-	// Mise a jour de l'URL de la page
-	try {
+		// Mise a jour de l'URL de la page
 		getLastPage($data.find('.pagi-fin-actif'));
-	} catch(e) {
-		console.log('[TopicLive] processPage>getLastPage :', e);
-	}
 
-	// Anti-expiration de la page
-	try {
+		// Anti-expiration de la page
 		$("#ajax_timestamp_liste_messages").val($data.find("#ajax_timestamp_liste_messages").val());
 		$("#ajax_hash_liste_messages").val($data.find("#ajax_hash_liste_messages").val());
-	} catch(e){
-		console.log('[TopicLive] processPage>antiExpiration :', e);
-	}
-	
-	// Ajout des nouveaux messages a la page
-	$data.find(".bloc-message-forum").each(function(){
-		try {
+		
+		// Ajout des nouveaux messages a la page
+		$data.find(".bloc-message-forum").each(function()
+		{
 			ajouterPost($(this));
-		} catch(e) {
-			console.log("[TopicLive] processPage>ajouterPost :", e);
-		}
-	});
+		});
 
-	try {
-		// Fix des liens (automatique via jvcare)
-		jsli.Transformation();
-	} catch(e) {
-		console.log('[TopicLive] processPage>fonctionsJVC :', e);
+		try
+		{
+			// Fix des liens (automatique via jvcare)
+			jsli.Transformation();
+		}
+		catch(e)
+		{
+			console.log('[TopicLive] Erreur jvCare : liens HS');
+		}
+
+		dispatchEvent(new CustomEvent('topiclive:doneprocessing', {
+			'detail': {
+				jvcake: jvCake
+			}
+		}));
+		
+		// Changement de la favicon en cas de nouveaux messages
+		if(!isTabActive && newPosts > 0) setFavicon("" + newPosts);
+
+		if(shouldReload) {
+			console.log('[TopicLive] Chargement de page (shouldReload)');
+			obtenirPage(processPage);
+		} else chargementPropre();
 	}
-
-	dispatchEvent(new CustomEvent('topiclive:doneprocessing', {
-		'detail': {
-			jvcake: jvCake
-		}
-	}));
-	
-	// Changement de la favicon en cas de nouveaux messages
-	if(!isTabActive && newPosts > 0) setFavicon("" + newPosts);
-
-	if(shouldReload) {
-		console.log('[TopicLive] Chargement de page (shouldReload)');
-		obtenirPage(processPage);
-	} else chargementPropre();
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur processPage : ' + e);
+	}
 }
 
 /**
@@ -130,80 +135,101 @@ function processPage($data) {
  */
 function ajouterPost($post)
 {
-	if(parseInt($post.attr('data-id'),10) > lastPost)
+	try
 	{
-		newPosts++;
-		lastPost = parseInt($post.attr('data-id'),10);
-			   
-		if(isOnLastPage) {
-				   
-			$post.hide();
-			$('.bloc-message-forum').last().after($post);
-			fixCitation($post);
-			$post.fadeIn('slow');
-					
-		} else {
-			actualiserBanniere();
-		}
-
-		dispatchEvent(new CustomEvent("topiclive:newmessage", {
-			'detail': {
-				id: $post.attr("id"),
-				jvcake: jvCake
-			}
-		}));
-		
-		if(localStorage['topiclive_son'] == 'bru' && shouldReload == false) son.play();
-
-		shouldReload = false;
-	}
-	else
-	{
-		var postid = $post.attr("id");
-		var $message = $("#" + postid);
-
-		if($message.find('.info-edition-msg').length == 1) // Si le message a ete edite
+		if(parseInt($post.attr('data-id'),10) > lastPost)
 		{
-			if(postid in editions) // si le message etait deja edite
+			newPosts++;
+			lastPost = parseInt($post.attr('data-id'),10);
+				   
+			if(isOnLastPage) {
+					   
+				$post.hide();
+				$('.bloc-message-forum').last().after($post);
+				fixCitation($post);
+				$post.fadeIn('slow');
+						
+			} else {
+				actualiserBanniere();
+			}
+
+			dispatchEvent(new CustomEvent("topiclive:newmessage", {
+				'detail': {
+					id: $post.attr("id"),
+					jvcake: jvCake
+				}
+			}));
+			
+			if(localStorage['topiclive_son'] == 'bru' && shouldReload == false) son.play();
+
+			shouldReload = false;
+		}
+		else
+		{
+			var postid = $post.attr("id");
+			var $message = $("#" + postid);
+
+			if($message.find('.info-edition-msg').length == 1) // Si le message a ete edite
 			{
-				if(editions[postid] != $post.find('.info-edition-msg').text()) // si l'edition est plus recente
+				if(postid in editions) // si le message etait deja edite
+				{
+					if(editions[postid] != $post.find('.info-edition-msg').text()) // si l'edition est plus recente
+					{
+						updatePost($message, $post);
+					}
+				}
+				else
 				{
 					updatePost($message, $post);
 				}
 			}
-			else
-			{
-				updatePost($message, $post);
-			}
+		}
+
+		try
+		{
+			// Fix spoilers
+			replace_spoilers($post[0]);
+		}
+		catch(e)
+		{
+			console.log('[TopicLive] Erreur spoilers : les spoilers seront invisibles');
 		}
 	}
-
-	// Fix spoilers
-	replace_spoilers($post[0]);
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur ajouterPost : ' + e);
+	}
 }
 
 function updatePost($oldPost, $newPost)
 {
-	editions[$oldPost.attr('id')] = $newPost.find('.info-edition-msg').text();
+	try
+	{
+		editions[$oldPost.attr('id')] = $newPost.find('.info-edition-msg').text();
 
-	// Maj des messages edites
-	$oldPost.find('.bloc-contenu').html($newPost.find('.bloc-contenu').html());
+		// Maj des messages edites
+		$oldPost.find('.bloc-contenu').html($newPost.find('.bloc-contenu').html());
 
-	dispatchEvent(new CustomEvent("topiclive:edition", {
-		'detail': {
-			id: $oldPost.attr("id"),
-			jvcake: jvCake
-		}
-	}));
-	
-	// Clignotement des messages edites
-	var defColor = $oldPost.css("backgroundColor");
-	$oldPost.animate({
-		backgroundColor: "#FF9900"
-	}, 50);
-	$oldPost.animate({
-		backgroundColor: defColor
-	}, 500);
+		dispatchEvent(new CustomEvent("topiclive:edition", {
+			'detail': {
+				id: $oldPost.attr("id"),
+				jvcake: jvCake
+			}
+		}));
+		
+		// Clignotement des messages edites
+		var defColor = $oldPost.css("backgroundColor");
+		$oldPost.animate({
+			backgroundColor: "#FF9900"
+		}, 50);
+		$oldPost.animate({
+			backgroundColor: defColor
+		}, 500);
+	}
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur updatePost : ' + e);
+	}
 }
 
 /**
@@ -211,53 +237,60 @@ function updatePost($oldPost, $newPost)
  */
 function obtenirPage(cb)
 {
-	var lInstance = instance;
+	try
+	{
+		var lInstance = instance;
 
-	$('.bloc-header-form').text('Répondre ○');
-	
-	$.ajax({
-		url: urlToLoad,
-		dataType: 'text',
-		type: 'GET',
-		success: function(data)
-		{
-			if(lInstance == instance)
+		$('.bloc-header-form').text('Répondre ○');
+		
+		$.ajax({
+			url: urlToLoad,
+			dataType: 'text',
+			type: 'GET',
+			success: function(data)
 			{
-				try
+				if(lInstance == instance)
 				{
-					cb($(data));
-				}
-				catch(e)
-				{
-					console.log('[TopicLive] Erreur de parsing :(');
-
 					try
 					{
-						cb($(data.substring(124)));
+						cb($(data));
 					}
 					catch(e)
 					{
-						console.log('[TopicLive] Erreur de parsing :( chargement impossible');
-					}
-				}
+						console.log('[TopicLive] Erreur de parsing :(');
 
-				$('.bloc-header-form').text('Répondre ●');
-				setTimeout(function()
+						try
+						{
+							cb($(data.substring(124)));
+						}
+						catch(e)
+						{
+							console.log('[TopicLive] Erreur de parsing :( chargement impossible');
+						}
+					}
+
+					$('.bloc-header-form').text('Répondre ●');
+					setTimeout(function()
+					{
+						$('.bloc-header-form').text('Répondre');
+					}, 100)
+				}
+				else
 				{
-					$('.bloc-header-form').text('Répondre');
-				}, 100)
-			}
-			else
+					console.log('[TopicLive] Nouvelle instance detectee : arret du chargement de la page');
+				}
+			},
+			error: function()
 			{
-				console.log('[TopicLive] Nouvelle instance detectee : arret du chargement de la page');
+				console.log('[TopicLive] Erreur lors du chargement de la page.')
+				obtenirPage(cb);
 			}
-		},
-		error: function()
-		{
-			console.log('[TopicLive] Erreur lors du chargement de la page.')
-			obtenirPage(cb);
-		}
-	});
+		});
+	}
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur obtenirPage : ' + e);
+	}
 }
 
 /**
@@ -302,26 +335,33 @@ function jvCake(classe)
  */
 function fixCitation($message)
 {
-	var id = $message.attr("data-id"),
-		pseudo = $(".bloc-pseudo-msg", $message).text().replace(/[\r\n]/g, ""),
-		date = $(".bloc-date-msg", $message).text().replace(/[\r\n]/g, "").replace(/[\r\n]/g, "").replace(/#[0-9]+$/g, "");
-	
-	$message.find(".bloc-options-msg .picto-msg-quote").on("click", function() {
-		$.ajax({
-			type: "POST",
-			url: "/forums/ajax_citation.php",
-			dataType: "json",
-			data: {
-				id_message: id,
-				ajax_timestamp: $("#ajax_timestamp_liste_messages").val(),
-				ajax_hash: $("#ajax_hash_liste_messages").val()
-			},
-			success: function(e) {
-				n = $("#message_topic");
-				n.val("> Le " + date + " " + pseudo + " a écrit :\n>" + e.txt.split("\n").join("\n> ") + "\n\n" + n.val());
-			}
+	try
+	{
+		var id = $message.attr("data-id"),
+			pseudo = $(".bloc-pseudo-msg", $message).text().replace(/[\r\n]/g, ""),
+			date = $(".bloc-date-msg", $message).text().replace(/[\r\n]/g, "").replace(/[\r\n]/g, "").replace(/#[0-9]+$/g, "");
+		
+		$message.find(".bloc-options-msg .picto-msg-quote").on("click", function() {
+			$.ajax({
+				type: "POST",
+				url: "/forums/ajax_citation.php",
+				dataType: "json",
+				data: {
+					id_message: id,
+					ajax_timestamp: $("#ajax_timestamp_liste_messages").val(),
+					ajax_hash: $("#ajax_hash_liste_messages").val()
+				},
+				success: function(e) {
+					n = $("#message_topic");
+					n.val("> Le " + date + " " + pseudo + " a écrit :\n>" + e.txt.split("\n").join("\n> ") + "\n\n" + n.val());
+				}
+			});
 		});
-	});
+	}
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur fixCitation : ' + e);
+	}
 }
 
 /**
@@ -329,111 +369,125 @@ function fixCitation($message)
  */
 function majFormulaire($page, majCaptcha)
 {
-	var $newForm = $page.find(".form-post-message");
-	var $formulaire = $('.form-post-message');
-	
-	// Si TopicLive demande deja un captcha
-	if($formulaire.find(".col-md-12").length == 3)
+	try
 	{
-		if($newForm.find(".col-md-12").length == 3 && !majCaptcha)
-			return;
+		var $newForm = $page.find(".form-post-message");
+		var $formulaire = $('.form-post-message');
 		
-		$formulaire.find(".col-md-12:eq(1)").remove();
-	}
-	
-	// Si un captcha est demande
-	if($newForm.find(".col-md-12").length == 3)
-	{
-		$formulaire.find(".col-md-12:first").after($newForm.find(".col-md-12:eq(1)"));
-	}
-	
-	$formulaire.unbind("submit");
-	$formulaire.on("submit", function(e)
-	{
-		$.ajax({
-			type: "POST",
-			url: "/forums/ajax_check_poste_message.php",
-			data: {
-				id_topic: id_topic,
-				new_message: $("#message_topic").val(),
-				ajax_timestamp: $page.find("#ajax_timestamp_liste_messages").val(),
-				ajax_hash: $page.find("#ajax_hash_liste_messages").val()
-			},
-			dataType: "json",
-			success: function(e) {
-				if(e.erreurs.length !== 0)
-				{
-					var message_erreur = "";
-					for (var i = 0; i < e.erreurs.length; i++)
+		// Si TopicLive demande deja un captcha
+		if($formulaire.find(".col-md-12").length == 3)
+		{
+			if($newForm.find(".col-md-12").length == 3 && !majCaptcha)
+				return;
+			
+			$formulaire.find(".col-md-12:eq(1)").remove();
+		}
+		
+		// Si un captcha est demande
+		if($newForm.find(".col-md-12").length == 3)
+		{
+			$formulaire.find(".col-md-12:first").after($newForm.find(".col-md-12:eq(1)"));
+		}
+		
+		$formulaire.unbind("submit");
+		$formulaire.on("submit", function(e)
+		{
+			$.ajax({
+				type: "POST",
+				url: "/forums/ajax_check_poste_message.php",
+				data: {
+					id_topic: id_topic,
+					new_message: $("#message_topic").val(),
+					ajax_timestamp: $page.find("#ajax_timestamp_liste_messages").val(),
+					ajax_hash: $page.find("#ajax_hash_liste_messages").val()
+				},
+				dataType: "json",
+				success: function(e) {
+					if(e.erreurs.length !== 0)
 					{
-						message_erreur += e.erreurs[i];
-						if(i < e.erreurs.length)
-							message_erreur += "<br />";
+						var message_erreur = "";
+						for (var i = 0; i < e.erreurs.length; i++)
+						{
+							message_erreur += e.erreurs[i];
+							if(i < e.erreurs.length)
+								message_erreur += "<br />";
+						}
+						
+						modal("erreur", {
+							message: message_erreur
+						});
 					}
-					
-					modal("erreur", {
-						message: message_erreur
+					else
+					{
+						// Si il n'y a pas d'erreurs
+						postRespawn($newForm);
+					}
+				},
+				error: function()
+				{
+					modal('erreur', {
+						message: 'Erreur lors de la vérification du message.'
 					});
 				}
-				else
-				{
-					// Si il n'y a pas d'erreurs
-					postRespawn($newForm);
-				}
-			},
-			error: function()
-			{
-				modal('erreur', {
-					message: 'Erreur lors de la vérification du message.'
-				});
-			}
+			});
+		
+			return false;
 		});
-	
-		return false;
-	});
+	}
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur majFormulaire : ' + e);
+	}
 }
 
 /**
  * Poste un message sans recharger la page
  */
-function postRespawn($newForm) {
+function postRespawn($newForm)
+{
+	try
+	{
+		var $formulaire = $('.form-post-message');
+		$formulaire.find('.btn-poster-msg').attr('disabled','disabled');
+		$formulaire.find('.conteneur-editor').fadeOut();
+		
+		// On prend les données du nouveau formulaire : pseudo, message, tokens...
+		var formData = {};
+		$.each($newForm.serializeArray(), function(i, j) {
+			formData[j.name] = j.value;
+		});
+		// On rajoute le message et captcha aux donnees
+		formData.message_topic = $formulaire.find("#message_topic").val();
+		if($formulaire.find(".col-md-12").length == 3)
+			formData.fs_ccode = $formulaire.find("#code_captcha").val();
 
-	var $formulaire = $('.form-post-message');
-	$formulaire.find('.btn-poster-msg').attr('disabled','disabled');
-	$formulaire.find('.conteneur-editor').fadeOut();
-	
-	// On prend les données du nouveau formulaire : pseudo, message, tokens...
-	var formData = {};
-	$.each($newForm.serializeArray(), function(i, j) {
-		formData[j.name] = j.value;
-	});
-	// On rajoute le message et captcha aux donnees
-	formData.message_topic = $formulaire.find("#message_topic").val();
-	if($formulaire.find(".col-md-12").length == 3)
-		formData.fs_ccode = $formulaire.find("#code_captcha").val();
-
-	// Envoi du message
-	$.ajax({
-		type: 'POST',
-		url: document.URL,
-		data: formData,
-		success: function(data){
-			var $data = $(data);
-			majFormulaire($data, true);
-			console.log('[TopicLive] Chargement de page (postRespawn)');
-			shouldReload = true;
-			obtenirPage(processPage);
-			
-			$formulaire.find('.btn-poster-msg').removeAttr("disabled");
-			$("#message_topic").val("");
-			$formulaire.find('.conteneur-editor').fadeIn();
-		},
-		error: function()
-		{
-			console.log('[TopicLive] Erreur lors de l\'envoi d\'un message');
-			postRespawn($newForm);
-		}
-	});
+		// Envoi du message
+		$.ajax({
+			type: 'POST',
+			url: document.URL,
+			data: formData,
+			success: function(data){
+				var $data = $(data);
+				majFormulaire($data, true);
+				console.log('[TopicLive] Chargement de page (postRespawn)');
+				shouldReload = true;
+				obtenirPage(processPage);
+				
+				$formulaire.find('.btn-poster-msg').removeAttr("disabled");
+				$("#message_topic").val("");
+				$formulaire.find('.conteneur-editor').fadeIn();
+			},
+			error: function()
+			{
+				console.log('[TopicLive] Erreur lors de l\'envoi d\'un message');
+				postRespawn($newForm);
+			}
+		});
+	}
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur postRespawn : ' + e);
+	}
 }
 
 function chargementPropre() {
@@ -486,7 +540,11 @@ function setFavicon(nvxMessages) {
 		
 		$("head").append(lienFavicon);
 	
-	} catch(e){console.log(e);}
+	}
+	catch(e)
+	{
+		console.log('[TopicLive] Erreur setFavicon : ' + e);
+	}
 	
 }
 
