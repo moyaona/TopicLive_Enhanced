@@ -121,7 +121,7 @@ function processPage($data) {
 		if(shouldReload) {
 			console.log('[TopicLive] Chargement de page (shouldReload)');
 			obtenirPage(processPage);
-		} else chargementPropre();
+		} else chargementAuto();
 	}
 	catch(e)
 	{
@@ -490,7 +490,7 @@ function postRespawn($newForm)
 	}
 }
 
-function chargementPropre() {
+function chargementAuto() {
 	window.clearTimeout(idanalyse);
 	var lInstance = instance;
 	idanalyse = setTimeout(function(){
@@ -621,8 +621,8 @@ function main() {
 		registerTabs();
 		setFavicon("");
 		ajouterOption();
-		chargementPropre();
 		majFormulaire($(document), true);
+		obtenirPage(processPage);
 	}
 }
 
