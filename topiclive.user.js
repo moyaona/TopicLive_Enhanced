@@ -169,7 +169,7 @@ function ajouterPost($post)
 			var postid = $post.attr("id");
 			var $message = $("#" + postid);
 
-			if($message.find('.info-edition-msg').length == 1) // Si le message a ete edite
+			if($post.find('.info-edition-msg').length == 1) // Si le message a ete edite
 			{
 				if(postid in editions) // si le message etait deja edite
 				{
@@ -605,6 +605,18 @@ function main() {
 			isOnLastPage = true;
 			urlToLoad = document.URL;
 		}
+
+		// Ajout des messages edites a la liste de messages edites
+		$('.bloc-message-forum').each(function()
+		{
+			var $post = $(this);
+			var $edit = $post.find('.info-edition-msg');
+
+			if($edit.length == 1)
+			{
+				editions[$post.attr('id')] = $edit.text();
+			}
+		});
 		 
 		registerTabs();
 		setFavicon("");
