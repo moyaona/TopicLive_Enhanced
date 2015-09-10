@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/forums/*
 // @include http://www.forumjv.com/forums/*
-// @version 4.8.6
+// @version 4.8.7
 // ==/UserScript==
 
 // Compatibilité Google Chrome & Opera
@@ -247,6 +247,7 @@ function obtenirPage(cb)
 			url: urlToLoad,
 			dataType: 'text',
 			type: 'GET',
+			timeout: 5000,
 			success: function(data)
 			{
 				if(lInstance == instance)
@@ -402,6 +403,7 @@ function majFormulaire($page, majCaptcha)
 					ajax_hash: $page.find("#ajax_hash_liste_messages").val()
 				},
 				dataType: "json",
+				timeout: 5000,
 				success: function(e) {
 					if(e.erreurs.length !== 0)
 					{
@@ -466,6 +468,7 @@ function postRespawn($newForm)
 			type: 'POST',
 			url: document.URL,
 			data: formData,
+			timeout: 5000,
 			success: function(data){
 				var $data = $(data);
 				majFormulaire($data, true);
