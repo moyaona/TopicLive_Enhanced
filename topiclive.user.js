@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/forums/*
 // @include http://www.forumjv.com/forums/*
-// @version 4.8.7
+// @version 4.8.8
 // ==/UserScript==
 
 // Compatibilité Google Chrome & Opera
@@ -262,7 +262,8 @@ function obtenirPage(cb)
 
 						try
 						{
-							cb($(data.substring(124)));
+							// Fix des bugs de JVC
+							cb($(data.substring(data.indexOf('<!DOCTYPE html>'))));
 						}
 						catch(e)
 						{
