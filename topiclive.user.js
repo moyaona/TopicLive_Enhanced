@@ -254,21 +254,11 @@ function obtenirPage(cb)
 				{
 					try
 					{
-						cb($(data));
+						cb($(data.substring(data.indexOf('<!DOCTYPE html>'))));
 					}
 					catch(e)
 					{
-						console.log('[TopicLive] Erreur de parsing :(');
-
-						try
-						{
-							// Fix des bugs de JVC
-							cb($(data.substring(data.indexOf('<!DOCTYPE html>'))));
-						}
-						catch(e)
-						{
-							console.log('[TopicLive] Erreur de parsing :( chargement impossible');
-						}
+						console.log('[TopicLive] Erreur de parsing :( chargement impossible : ' + e);
 					}
 
 					$('.bloc-header-form').text('Répondre ●');
@@ -470,12 +460,8 @@ function postRespawn($newForm)
 			url: document.URL,
 			data: formData,
 			timeout: 5000,
-			success: function(data){
-				var $data = $(data);
-				majFormulaire($data, true);
-				console.log('[TopicLive] Chargement de page (postRespawn)');
-				shouldReload = true;
-				obtenirPage(processPage);
+			success: function(data) {
+				processPage($(data.substring(data.indexOf('<!DOCTYPE html>'))));
 				
 				$formulaire.find('.btn-poster-msg').removeAttr("disabled");
 				$("#message_topic").val("");
