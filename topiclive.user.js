@@ -544,12 +544,19 @@ function envoyerMessage($newForm)
 			url: document.URL,
 			data: formData,
 			timeout: 5000,
-			success: function(data) {
-				processPage($(data.substring(data.indexOf('<!DOCTYPE html>'))));
+			success: function(data)
+			{
+				var $page = $(data.substring(data.indexOf('<!DOCTYPE html>')));
 				
+				if(isMP) {
+					$('#message').val($page.find('#message').val());
+				} else {
+					$('#message_topic').val($page.find('#message_topic').val());
+					$formulaire.find('.conteneur-editor').fadeIn();
+				}
+				
+				processPage($page);
 				$formulaire.find('.btn-poster-msg').removeAttr('disabled');
-				$(isMP ? '#message' : '#message_topic').val('');
-				$formulaire.find('.conteneur-editor').fadeIn();
 			},
 			error: function()
 			{
