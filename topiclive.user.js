@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/*
 // @include http://www.forumjv.com/*
-// @version 4.9.0
+// @version 4.9.1
 // ==/UserScript==
 
 // Compatibilité Google Chrome & Opera
@@ -15,9 +15,9 @@ script.parentNode.removeChild(script);
 function wrapper() {
 
 // Etat de TopicLive
-var instance = 0, idanalyse = -1, shouldReload = false;
+var instance = 0, idanalyse = -1;
 // Etat de la page
-var urlToLoad, isOnLastPage, isTabActive, isMP;
+var urlToLoad, isOnLastPage, isTabActive, isMP, majCaptcha;
 // Etat des posts
 var lastPost, newPosts, editions = {};
 // Data
@@ -95,6 +95,7 @@ function processPage($data)
 		}
 
 		// Mise a jour de l'URL de la page
+		var oldUrl = urlToLoad;
 		if(!isMP) getLastPage($data.find('.pagi-fin-actif'));
 
 		// Anti-expiration de la page
@@ -109,7 +110,7 @@ function processPage($data)
 		// Changement de la favicon en cas de nouveaux messages
 		if(!isTabActive && newPosts > 0) setFavicon("" + newPosts);
 
-		if(shouldReload) {
+		if(oldUrl != urlToLoad) {
 			console.log('[TopicLive] Chargement de page (shouldReload)');
 			obtenirPage(processPage);
 		} else chargementAuto();
@@ -176,7 +177,6 @@ function ajouterPosts($page)
 function ajouterPost($post)
 {
 	newPosts++;
-	shouldReload = false;
 	
 	if(isOnLastPage) {
 		$post.hide();
@@ -189,7 +189,7 @@ function ajouterPost($post)
 	}
 	
 	try {
-		if(localStorage['topiclive_son'] == 'bru' && shouldReload == false) son.play();
+		if(localStorage['topiclive_son'] == 'bru') son.play();
 	} catch(e) {
 		console.log('[TopicLive] Impossible de jouer le son de nouveau message');
 	}
@@ -418,7 +418,7 @@ function getCaptcha($formulaire)
 /**
  * Met a jour le formulaire pour poster sans rechargement
  */
-function majFormulaire($page, majCaptcha)
+function majFormulaire($page)
 {
 	try
 	{
@@ -440,7 +440,6 @@ function majFormulaire($page, majCaptcha)
 		// Si un captcha est demande
 		if(captchaApres.length)
 		{
-			// Note : le captcha pourrait bug hors forumjv et mps
 			$formulaire.find('.jv-editor').after(captchaApres.parent());
 		}
 		
@@ -555,7 +554,9 @@ function envoyerMessage($newForm)
 					$formulaire.find('.conteneur-editor').fadeIn();
 				}
 				
+				majCaptcha = true;
 				processPage($page);
+				majCaptcha = false;
 				$formulaire.find('.btn-poster-msg').removeAttr('disabled');
 			},
 			error: function()
@@ -679,6 +680,7 @@ function main()
 	if($('.conteneur-message').length > 0)
 	{
 		formData = {};
+		majCaptcha = false;
 		isTabActive = true;
 		isMP = $('#mp-page').length;
 	
@@ -707,7 +709,7 @@ function main()
 		registerTabs();
 		setFavicon('');
 		if(!isMP) ajouterOption();
-		majFormulaire($(document), true);
+		majFormulaire($(document));
 		obtenirPage(processPage);
 	}
 }
