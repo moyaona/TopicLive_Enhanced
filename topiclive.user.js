@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/*
 // @include http://www.forumjv.com/*
-// @version 4.9.0
+// @version 4.9.1
 // ==/UserScript==
 
 // Compatibilité Google Chrome & Opera
@@ -15,7 +15,7 @@ script.parentNode.removeChild(script);
 function wrapper() {
 
 // Etat de TopicLive
-var instance = 0, idanalyse = -1, shouldReload = false;
+var instance = 0, idanalyse = -1;
 // Etat de la page
 var urlToLoad, isOnLastPage, isTabActive, isMP;
 // Etat des posts
@@ -95,6 +95,7 @@ function processPage($data)
 		}
 
 		// Mise a jour de l'URL de la page
+		var oldUrl = urlToLoad;
 		if(!isMP) getLastPage($data.find('.pagi-fin-actif'));
 
 		// Anti-expiration de la page
@@ -109,7 +110,7 @@ function processPage($data)
 		// Changement de la favicon en cas de nouveaux messages
 		if(!isTabActive && newPosts > 0) setFavicon("" + newPosts);
 
-		if(shouldReload) {
+		if(oldUrl != urlToLoad) {
 			console.log('[TopicLive] Chargement de page (shouldReload)');
 			obtenirPage(processPage);
 		} else chargementAuto();
@@ -176,7 +177,6 @@ function ajouterPosts($page)
 function ajouterPost($post)
 {
 	newPosts++;
-	shouldReload = false;
 	
 	if(isOnLastPage) {
 		$post.hide();
@@ -189,7 +189,7 @@ function ajouterPost($post)
 	}
 	
 	try {
-		if(localStorage['topiclive_son'] == 'bru' && shouldReload == false) son.play();
+		if(localStorage['topiclive_son'] == 'bru') son.play();
 	} catch(e) {
 		console.log('[TopicLive] Impossible de jouer le son de nouveau message');
 	}
