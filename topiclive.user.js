@@ -216,24 +216,27 @@ function majPost($post)
 {
 	var postid = $post.attr('id');
 	var $message = $('#' + postid);
-
-	if($post.find('.info-edition-msg').length == 1) // Si le message a ete edite
+	
+	// Si le message a ete edite
+	if($post.find('.info-edition-msg').length == 1)
 	{
-		if(postid in editions) // si le message etait deja edite
+		// Si le message etait deja edite
+		if(postid in editions)
 		{
-			if(editions[postid] != $post.find('.info-edition-msg').text()) // si l'edition est plus recente
-			{
-				updatePost($message, $post);
+			// Si l'edition est plus recente
+			if(editions[postid] != $post.find('.info-edition-msg').text()) {
+				remplacerMessage($message, $post);
 			}
-		}
-		else
-		{
-			updatePost($message, $post);
+		} else {
+			remplacerMessage($message, $post);
 		}
 	}
 }
 
-function updatePost($oldPost, $newPost)
+/**
+ * Remplace un post par sa nouvelle version editee
+ */
+function remplacerMessage($oldPost, $newPost)
 {
 	try
 	{
@@ -260,7 +263,7 @@ function updatePost($oldPost, $newPost)
 	}
 	catch(e)
 	{
-		console.log('[TopicLive] Erreur updatePost : ' + e);
+		console.log('[TopicLive] Erreur remplacerMessage : ' + e);
 	}
 }
 
@@ -445,10 +448,10 @@ function majFormulaire($page, majCaptcha)
 		$formulaire.on('submit', function(e)
 		{
 			if(isMP) {
-				postRespawn($newForm);
+				envoyerMessage($newForm);
 			} else {
 				verifMessage(function() {
-					postRespawn($newForm);
+					envoyerMessage($newForm);
 				});
 			}
 			
@@ -510,7 +513,7 @@ function verifMessage(callback)
 /**
  * Poste un message sans recharger la page
  */
-function postRespawn($newForm)
+function envoyerMessage($newForm)
 {
 	try
 	{
@@ -545,19 +548,24 @@ function postRespawn($newForm)
 				processPage($(data.substring(data.indexOf('<!DOCTYPE html>'))));
 				
 				$formulaire.find('.btn-poster-msg').removeAttr('disabled');
-				$('#message_topic').val('');
+				$(isMP ? '#message' : '#message_topic').val('');
 				$formulaire.find('.conteneur-editor').fadeIn();
 			},
 			error: function()
 			{
-				console.log('[TopicLive] Erreur lors de l\'envoi d\'un message');
-				postRespawn($newForm);
+				modal('[TopicLive] Erreur lors de l\'envoi d\'un message');
+				
+				if(isMP) {
+					$('#message').val(formData.message);
+				} else {
+					$('#message_topic').val(formData.message_topic);
+				}
 			}
 		});
 	}
 	catch(e)
 	{
-		console.log('[TopicLive] Erreur postRespawn : ' + e);
+		console.log('[TopicLive] Erreur envoyerMessage : ' + e);
 	}
 }
 
