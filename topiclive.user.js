@@ -88,7 +88,7 @@ function processPage($data)
 		if(lastPost == -1)
 		{
 			if(isMP) {
-				lastPost = $data.find('#last_msg');
+				lastPost = $data.find('#last_msg').text();
 			} else {
 				lastPost = parseInt($data.find('.bloc-message-forum:last').attr('data-id'),10);
 			}
@@ -658,15 +658,15 @@ function main()
 {
 	console.log("[TopicLive] Script charge.");
 	instance++;
+	newPosts = 0;
+	lastPost = -1;
 	
 	if($('.conteneur-message').length > 0)
 	{
-		lastPost = -1;
-		newPosts = 0;
 		formData = {};
 		isTabActive = true;
 		isMP = $('#mp-page').length;
-
+	
 		if($('.pagi-fin-actif').length == 2) {
 			isOnLastPage = false;
 			getLastPage($('.pagi-fin-actif'));
