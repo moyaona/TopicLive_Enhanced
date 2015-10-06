@@ -444,46 +444,14 @@ function majFormulaire($page, majCaptcha)
 		$formulaire.unbind('submit');
 		$formulaire.on('submit', function(e)
 		{
-			$.ajax({
-				type: 'POST',
-				url: '/forums/ajax_check_poste_message.php',
-				data: {
-					id_topic: id_topic,
-					new_message: $('#message_topic').val(),
-					ajax_timestamp: $page.find('#ajax_timestamp_liste_messages').val(),
-					ajax_hash: $page.find('#ajax_hash_liste_messages').val()
-				},
-				dataType: 'json',
-				timeout: 5000,
-				success: function(e) {
-					if(e.erreurs.length !== 0)
-					{
-						var message_erreur = '';
-						for (var i = 0; i < e.erreurs.length; i++)
-						{
-							message_erreur += e.erreurs[i];
-							if(i < e.erreurs.length)
-								message_erreur += '<br />';
-						}
-						
-						modal('erreur', {
-							message: message_erreur
-						});
-					}
-					else
-					{
-						// Si il n'y a pas d'erreurs
-						postRespawn($newForm);
-					}
-				},
-				error: function()
-				{
-					modal('erreur', {
-						message: 'Erreur lors de la vérification du message.'
-					});
-				}
-			});
-		
+			if(isMP) {
+				postRespawn($newForm);
+			} else {
+				verifMessage(function() {
+					postRespawn($newForm);
+				});
+			}
+			
 			return false;
 		});
 	}
@@ -491,6 +459,52 @@ function majFormulaire($page, majCaptcha)
 	{
 		console.log('[TopicLive] Erreur majFormulaire : ' + e);
 	}
+}
+
+/**
+ * Verifie si un message est ok pour l'envoi
+ */
+function verifMessage(callback)
+{
+	$.ajax({
+		type: 'POST',
+		url: '/forums/ajax_check_poste_message.php',
+		data: {
+			id_topic: id_topic,
+			new_message: $('#message_topic').val(),
+			ajax_timestamp: $('#ajax_timestamp_liste_messages').val(),
+			ajax_hash: $('#ajax_hash_liste_messages').val()
+		},
+		dataType: 'json',
+		timeout: 5000,
+		success: function(e) {
+			if(e.erreurs.length !== 0)
+			{
+				var message_erreur = '';
+				for (var i = 0; i < e.erreurs.length; i++)
+				{
+					message_erreur += e.erreurs[i];
+					if(i < e.erreurs.length)
+						message_erreur += '<br />';
+				}
+				
+				modal('erreur', {
+					message: message_erreur
+				});
+			}
+			else
+			{
+				// Si il n'y a pas d'erreurs
+				callback();
+			}
+		},
+		error: function()
+		{
+			modal('erreur', {
+				message: 'Erreur lors de la vérification du message.'
+			});
+		}
+	});
 }
 
 /**
