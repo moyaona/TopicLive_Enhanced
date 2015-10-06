@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name TopicLive
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
-// @include http://www.jeuxvideo.com/forums/*
-// @include http://www.forumjv.com/forums/*
-// @version 4.8.8
+// @include http://www.jeuxvideo.com/*
+// @include http://www.forumjv.com/*
+// @version 4.8.9
 // ==/UserScript==
 
 // Compatibilité Google Chrome & Opera
