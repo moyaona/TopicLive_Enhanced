@@ -17,7 +17,7 @@ function wrapper() {
 // Etat de TopicLive
 var instance = 0, idanalyse = -1;
 // Etat de la page
-var urlToLoad, isOnLastPage, isTabActive, isMP;
+var urlToLoad, isOnLastPage, isTabActive, isMP, majCaptcha;
 // Etat des posts
 var lastPost, newPosts, editions = {};
 // Data
@@ -418,7 +418,7 @@ function getCaptcha($formulaire)
 /**
  * Met a jour le formulaire pour poster sans rechargement
  */
-function majFormulaire($page, majCaptcha)
+function majFormulaire($page)
 {
 	try
 	{
@@ -440,7 +440,6 @@ function majFormulaire($page, majCaptcha)
 		// Si un captcha est demande
 		if(captchaApres.length)
 		{
-			// Note : le captcha pourrait bug hors forumjv et mps
 			$formulaire.find('.jv-editor').after(captchaApres.parent());
 		}
 		
@@ -555,7 +554,9 @@ function envoyerMessage($newForm)
 					$formulaire.find('.conteneur-editor').fadeIn();
 				}
 				
+				majCaptcha = true;
 				processPage($page);
+				majCaptcha = false;
 				$formulaire.find('.btn-poster-msg').removeAttr('disabled');
 			},
 			error: function()
@@ -679,6 +680,7 @@ function main()
 	if($('.conteneur-message').length > 0)
 	{
 		formData = {};
+		majCaptcha = false;
 		isTabActive = true;
 		isMP = $('#mp-page').length;
 	
@@ -707,7 +709,7 @@ function main()
 		registerTabs();
 		setFavicon('');
 		if(!isMP) ajouterOption();
-		majFormulaire($(document), true);
+		majFormulaire($(document));
 		obtenirPage(processPage);
 	}
 }
