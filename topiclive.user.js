@@ -3,7 +3,7 @@
 // @description Charge les nouveaux messages d'un topic de jeuxvideo.com en direct
 // @include http://www.jeuxvideo.com/*
 // @include http://www.forumjv.com/*
-// @version 4.8.9
+// @version 4.9.0
 // ==/UserScript==
 
 // Compatibilité Google Chrome & Opera
@@ -14,15 +14,17 @@ script.parentNode.removeChild(script);
 
 function wrapper() {
 
-var urlToLoad = '';
-var isOnLastPage = true, isTabActive = true, shouldReload = false;
-var lastPost = -1, newPosts = 0, idanalyse = -1;
-var instance = 0;
-var son = new Audio('http://kiwec.net/files/topiclive.ogg');
-var favicon = new Image();
-var lienFavicon = null;
+// Etat de TopicLive
+var instance = 0, idanalyse = -1, shouldReload = false;
+// Etat de la page
+var urlToLoad, isOnLastPage, isTabActive, isMP;
+// Etat des posts
+var lastPost, newPosts, editions = {};
+// Data
+var son = new Audio('http://kiwec.net/files/topiclive.ogg'),
+favicon = new Image(),
+lienFavicon = null;
 favicon.src = '/favicon.ico';
-var editions = {};
 
 /**
  * Ajoute l'option pour active ou desactiver le son de nouveau message
@@ -75,8 +77,8 @@ function getLastPage($boutonFin)
 /**
  * Traite les donnees obtenues par obtenirPage()
  */
-function processPage($data) {
-
+function processPage($data)
+{
 	try
 	{
 		// Mise a jour du formulaire
@@ -288,8 +290,8 @@ function obtenirPage(cb)
 /**
  * Ajoute ou actualise la banniere alertant des nouveaux messages
  */
-function actualiserBanniere() {
-
+function actualiserBanniere()
+{
 	var blocInfo;
 
 	if($('#loadposts').length === 0) {
@@ -304,7 +306,6 @@ function actualiserBanniere() {
 			+ '">Nouveaux messages depuis que vous avez chargé cette page : <strong style="color:#FF4000">'
 			+ newPosts + '</strong></a>');
 	$(blocInfo).fadeIn('slow');
-	 
 }
 
 /**
@@ -357,56 +358,85 @@ function fixCitation($message)
 }
 
 /**
+ * Renvoit le formulaire d'une page
+ */
+function getFormulaire($page)
+{
+	if(isMP) {
+		return $page.find('.form-post-topic');
+	} else {
+		return $page.find('.form-post-message');
+	}
+}
+
+/**
+ * Renvoit le captcha d'un formulaire
+ * NOTE : le bloc captcha s'obtient avec .parent()
+ */
+function getCaptcha($formulaire)
+{
+	if(isMP) {
+		return $formulaire.find('.bloc-cap');
+	} else {
+		return $formulaire.find('.captcha-boot-jv');
+	}
+}
+
+/**
  * Met a jour le formulaire pour poster sans rechargement
  */
 function majFormulaire($page, majCaptcha)
 {
 	try
 	{
-		var $newForm = $page.find(".form-post-message");
-		var $formulaire = $('.form-post-message');
+		var $formulaire = getFormulaire($(document));
+		var $newForm = getFormulaire($page);
+		var captchaAvant = getCaptcha($formulaire);
+		var captchaApres = getCaptcha($newForm);
 		
 		// Si TopicLive demande deja un captcha
-		if($formulaire.find(".col-md-12").length == 3)
+		if(captchaAvant.length)
 		{
-			if($newForm.find(".col-md-12").length == 3 && !majCaptcha)
+			if(captchaApres.length && !majCaptcha) {
 				return;
-			
-			$formulaire.find(".col-md-12:eq(1)").remove();
+			} else {
+				captchaAvant.parent().remove();
+			}
 		}
 		
 		// Si un captcha est demande
-		if($newForm.find(".col-md-12").length == 3)
+		if(captchaApres.length)
 		{
-			$formulaire.find(".col-md-12:first").after($newForm.find(".col-md-12:eq(1)"));
+			// Note : le captcha pourrait bug hors forumjv et mps
+			$formulaire.find('.jv-editor').after(captchaApres.parent());
 		}
 		
-		$formulaire.unbind("submit");
-		$formulaire.on("submit", function(e)
+		$formulaire.unbind('submit');
+		$formulaire.on('submit', function(e)
 		{
 			$.ajax({
-				type: "POST",
-				url: "/forums/ajax_check_poste_message.php",
+				type: 'POST',
+				url: '/forums/ajax_check_poste_message.php',
 				data: {
 					id_topic: id_topic,
-					new_message: $("#message_topic").val(),
-					ajax_timestamp: $page.find("#ajax_timestamp_liste_messages").val(),
-					ajax_hash: $page.find("#ajax_hash_liste_messages").val()
+					new_message: $('#message_topic').val(),
+					ajax_timestamp: $page.find('#ajax_timestamp_liste_messages').val(),
+					ajax_hash: $page.find('#ajax_hash_liste_messages').val()
 				},
-				dataType: "json",
+				dataType: 'json',
 				timeout: 5000,
 				success: function(e) {
 					if(e.erreurs.length !== 0)
 					{
-						var message_erreur = "";
+						var message_erreur = '';
 						for (var i = 0; i < e.erreurs.length; i++)
 						{
 							message_erreur += e.erreurs[i];
 							if(i < e.erreurs.length)
-								message_erreur += "<br />";
+								message_erreur += '<br />';
 						}
 						
-						modal("erreur", {
+						modal('erreur', {
 							message: message_erreur
 						});
 					}
@@ -496,10 +526,10 @@ function chargementAuto() {
  * Change la favicon pour alerter en cas de nouveaux messages
  * Code provenant de SpawnKill
  */
-function setFavicon(nvxMessages) {
-
-	try {
-	
+function setFavicon(nvxMessages)
+{
+	try
+	{
 		var canvas = $("<canvas>").get(0);
 		canvas.width = 16;
 		canvas.height = 16;
@@ -529,29 +559,27 @@ function setFavicon(nvxMessages) {
 		});
 		
 		$("head").append(lienFavicon);
-	
 	}
 	catch(e)
 	{
 		console.log('[TopicLive] Erreur setFavicon : ' + e);
 	}
-	
 }
 
 function registerTabs()
 {
 	// Alerte par titre
-	$(window).bind('focus', function(){                
+	$(window).bind('focus', function() {                
 		if(!isTabActive) {
 			isTabActive = true;
-			setFavicon("");
+			setFavicon('');
 			newPosts = 0;
 		}
 	});
-	$(window).bind('blur', function(){
+	$(window).bind('blur', function() {
 		if (isTabActive) {
 			isTabActive = false;
-			setFavicon("");
+			setFavicon('');
 			newPosts = 0;
 		}
 	});
@@ -575,18 +603,18 @@ function fixChromeHack()
 
 fixChromeHack();
 
-function main() {
-
+function main()
+{
 	console.log("[TopicLive] Script charge.");
 	instance++;
 	
-	// Topic
-	if($('.conteneur-message').length > 0) {
-
+	if($('.conteneur-message').length > 0)
+	{
 		lastPost = -1;
 		newPosts = 0;
 		formData = {};
 		isTabActive = true;
+		isMP = $('#mp-page').length;
 
 		if($('.pagi-fin-actif').length == 2) {
 			isOnLastPage = false;
@@ -597,20 +625,22 @@ function main() {
 		}
 
 		// Ajout des messages edites a la liste de messages edites
-		$('.bloc-message-forum').each(function()
-		{
-			var $post = $(this);
-			var $edit = $post.find('.info-edition-msg');
-
-			if($edit.length == 1)
+		if(!isMP) {
+			$('.bloc-message-forum').each(function()
 			{
-				editions[$post.attr('id')] = $edit.text();
-			}
-		});
+				var $post = $(this);
+				var $edit = $post.find('.info-edition-msg');
+	
+				if($edit.length == 1)
+				{
+					editions[$post.attr('id')] = $edit.text();
+				}
+			});
+		}
 		 
 		registerTabs();
-		setFavicon("");
-		ajouterOption();
+		setFavicon('');
+		if(!isMP) ajouterOption();
 		majFormulaire($(document), true);
 		obtenirPage(processPage);
 	}
