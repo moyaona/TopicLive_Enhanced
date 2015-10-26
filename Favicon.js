@@ -8,7 +8,6 @@ function Favicon()
     this.canvas.height = 16;
     this.image = new Image();
     this.image.src = '/favicon.ico';
-    this.lien = null;
 
     this.maj('');
   } catch(err) {
@@ -35,13 +34,14 @@ Favicon.prototype.maj = function(txt)
 
   var newFavicon = this.canvas.toDataURL('image/png');
 
-  if(this.lien !== null) this.lien.remove();
+  $('#topiclive_favicon').remove();
 
-  this.lien = $('<link>', {
+  var lien = $('<link>', {
+    id: 'topiclive_favicon',
     href: newFavicon,
     rel: 'shortcut icon',
     type: 'image/png'
   });
 
-  $('head').append(this.lien);
+  $('head').append(lien);
 };
