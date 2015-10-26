@@ -30,6 +30,7 @@ Message.prototype.afficher = function()
 Message.prototype.fixCitation = function()
 {
 	TL.log('message.fixCitation : ' + this.id_message);
+	var $msg = this.obtenirMessage();
 	this.$message.find('.bloc-options-msg .picto-msg-quote').on('click', function() {
 		$.ajax({
 			type: 'POST',
@@ -42,9 +43,8 @@ Message.prototype.fixCitation = function()
 			dataType: 'json',
 			timeout: 5000,
 			success: function() {
-				this.obtenirMessage().val('> Le ' + date + ' ' + pseudo +
-								' a écrit :\n>' + e.txt.split('\n').join('\n> ') +
-								'\n\n' + this.obtenirMessage().val());
+				$msg.val($msg.val() + '\n\n> Le ' + date + ' ' + pseudo +
+					' a écrit :\n>' + e.txt.split('\n').join('\n> '));
 			},
 			error: this.fixCitation
 		});
