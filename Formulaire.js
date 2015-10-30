@@ -7,8 +7,6 @@ function Formulaire()
 
 Formulaire.prototype.envoyer = function()
 {
-  TL.log('formu.envoyer()');
-
   // Si le message est invalide selon JVC
   if(typeof e !== 'undefined' && e.erreurs.length !== 0) {
     var message_erreur = '';
@@ -18,11 +16,10 @@ Formulaire.prototype.envoyer = function()
     }
     try {
       modal('erreur', { message: message_erreur });
-    } catch(err) {
-      TL.log('Erreur lors de l\'envoi du message : ' + err);
-    }
+      TL.log('Envoi annule car message invalide : ' + message_erreur);
+    } catch(err) { TL.log('### Erreur modal() (formulaire) : ' + err); }
   } else {
-    TL.log('Envoi du message...');
+    TL.log('Message valide. Envoi en cours');
     this.trouver('.btn-poster-msg').attr('disabled', 'disabled');
     this.trouver('.conteneur-editor').fadeOut();
     $.ajax({
@@ -31,18 +28,14 @@ Formulaire.prototype.envoyer = function()
       data: this.obtenirFormulaire().serializeArray(),
       timeout: 5000,
       success: (function(data) {
-        TL.log('Page de retour recue avec succes.');
+        TL.log('Message envoye avec succes');
         var nvPage = new Page($(data.substring(data.indexOf('<!DOCTYPE html>'))));
         this.forcerMaj = true;
         nvPage.scan();
       }).bind(this),
       error: function() {
-        try {
-          modal('message', {message:'Erreur lors de l\'envoi du message.'});
-        } catch(err) {
-          TL.log('Erreur lors de l\'envoi du message');
-          console.log(err);
-        }
+        try { modal('message', { message: 'Erreur lors de l\'envoi du message.' }); }
+        catch(err) { TL.log('### Erreur envoi du message : ' + err); }
       }
     });
   }
@@ -50,7 +43,7 @@ Formulaire.prototype.envoyer = function()
 
 Formulaire.prototype.maj = function($nvform)
 {
-  TL.log('formulaire.maj()');
+  // TL.log('Mise a jour du formulaire');
   var $form = this.obtenirFormulaire();
   var $cap = this.obtenirCaptcha($form);
   var $ncap = this.obtenirCaptcha($nvform);
@@ -74,33 +67,30 @@ Formulaire.prototype.maj = function($nvform)
 
   $form.off('submit');
   $form.on('submit', this.verifMessage.bind(this));
-  TL.log('formulaire.maj() : done');
+  // TL.log('Mise a jour du formulaire terminee');
 };
 
 Formulaire.prototype.obtenirCaptcha = function($form)
 {
-  TL.log('formulaire.obtenirCaptcha()');
   if(typeof $form === 'undefined') $form = this.obtenirFormulaire();
   return $form.find(TL.estMP ? '.bloc-cap' : '.captcha-boot-jv').parent();
 };
 
 Formulaire.prototype.obtenirMessage = function($form)
 {
-  TL.log('formulaire.obtenirMessage()');
   if(typeof $form == 'undefined') $form = this.obtenirFormulaire();
   return $form.find(TL.estMP ? '#message' : '#message_topic');
 };
 
 Formulaire.prototype.obtenirFormulaire = function($page)
 {
-  TL.log('formulaire.obtenirFormulaire()');
   if(typeof $page === 'undefined') $page = $(document);
   return $page.find(TL.estMP ? '.form-post-topic' : '.form-post-message');
 };
 
 Formulaire.prototype.verifMessage = function()
 {
-  TL.log('formulaire.verifEnvoi()');
+  TL.log('Verification du message avant envoi');
 
   if(TL.estMP) {
     this.envoyer();
@@ -126,6 +116,5 @@ Formulaire.prototype.verifMessage = function()
 
 Formulaire.prototype.trouver = function(chose)
 {
-  TL.log('formu.trouver : ' + chose);
   return this.obtenirFormulaire().find(chose);
 };

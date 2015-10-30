@@ -2,17 +2,14 @@
 function Favicon()
 {
   // TL.log('new favicon');
-  try {
-    this.canvas = $('<canvas>').get(0);
-    this.canvas.width = 16;
-    this.canvas.height = 16;
-    this.image = new Image();
-    this.image.src = '/favicon.ico';
+  this.canvas = $('<canvas>').get(0);
+  this.canvas.width = 16;
+  this.canvas.height = 16;
+  this.image = new Image();
+  this.image.src = '/favicon.ico';
 
-    this.maj('');
-  } catch(err) {
-    console.log(err);
-  }
+  try { this.maj(''); }
+  catch(err) { TL.log('### Erreur favicon (init) : ' + err); }
 }
 
 Favicon.prototype.maj = function(txt)
@@ -34,14 +31,12 @@ Favicon.prototype.maj = function(txt)
 
   var newFavicon = this.canvas.toDataURL('image/png');
 
-  $('#topiclive_favicon').remove();
-
-  var lien = $('<link>', {
-    id: 'topiclive_favicon',
+  if(typeof this.lien !== 'undefined') this.lien.remove();
+  this.lien = $('<link>', {
     href: newFavicon,
     rel: 'shortcut icon',
     type: 'image/png'
   });
 
-  $('head').append(lien);
+  $('head').append(this.lien);
 };

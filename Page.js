@@ -6,7 +6,7 @@ function Page($page)
 
 Page.prototype.obtenirMessages = function()
 {
-  TL.log('page.obtenirMessages()');
+  // TL.log('page.obtenirMessages()');
   var msgs = [];
   this.trouver('.bloc-message-forum').each(function() {
     msgs.push(new Message($(this)));
@@ -17,29 +17,23 @@ Page.prototype.obtenirMessages = function()
 // Appele quand il y a des nouveaux messages
 Page.prototype.maj = function()
 {
-  TL.log('page.maj()');
-  try {
-    TL.son.play();
-    if(!TL.ongletActif) TL.favicon.maj('' + TL.nvxMessages);
-  } catch(e) {
-    TL.log('Erreur : ' + e);
-  }
-  try {
-      jsli.Transformation();
-    } catch(e) {
-      TL.log('Erreur jsli.Transformation()');
-  }
+  TL.log('Nouveaux messages ! Execution favicon/son/spoilers');
+  try { if(!TL.ongletActif) TL.favicon.maj('' + TL.nvxMessages); }
+  catch(err) { TL.log('### Erreur favicon (maj) : ' + err); }
+  try { TL.son.play(); }
+  catch(err) { TL.log('### Erreur son : ' + err); }
+  try { jsli.Transformation(); }
+  catch(err) { TL.log('### Erreur jsli.Transformation() : ' + err); }
+
+  TL.log('Envoi de topiclive:doneprocessing');
   dispatchEvent(new CustomEvent('topiclive:doneprocessing', {
-    'detail': {
-      jvcake: TL.jvCake
-    }
+    'detail': { jvcake: TL.jvCake }
   }));
-  TL.log('page.maj() : done');
 };
 
 Page.prototype.scan = function()
 {
-  TL.log('Page.scan()');
+  TL.log('Scan de la page');
   TL.ajaxTs = this.trouver('#ajax_timestamp_liste_messages').val();
   TL.ajaxHash = this.trouver('#ajax_hash_liste_messages').val();
   TL.formu.maj(TL.formu.obtenirFormulaire(this.$page).clone());
@@ -80,7 +74,7 @@ Page.prototype.scan = function()
       }
     }
     if(nv) {
-      TL.log('Nouveau message !');
+      // TL.log('Nouveau message !');
       TL.messages.push(nvMsgs[k]);
       TL.nvxMessages++;
       nvMsgs[k].afficher();
@@ -88,7 +82,6 @@ Page.prototype.scan = function()
   }
 
   if(TL.nvxMessages > 0) {
-    TL.log('Nouveaux messages.');
     this.maj();
     TL.formu.forcerMaj = false;
   } else {

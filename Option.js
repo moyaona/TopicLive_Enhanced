@@ -9,7 +9,7 @@ function TLOption(nom, id)
 
 TLOption.prototype.injecter = function()
 {
-  TL.log('Option.injecter :' + this.nom);
+  TL.log('Ajout de l\'option ' + this.nom);
 
 	// Ajout de l'option aux options JVC
 	var option = '<li><span class="pull-left">' + this.nom + '<span>';
@@ -21,14 +21,14 @@ TLOption.prototype.injecter = function()
 	$('.menu-user-forum').append(option);
 
 	// Register des events lors du toggle de l'option
-	$('#' + this.id + '_ON').on('click', function() {
+	$('#' + this.id + '_ON').on('click', (function() {
 		localStorage[this.id] = 'true';
 		$('#' + this.id + '_ON').attr('class', 'interrupteur-inline actif');
 		$('#' + this.id + '_OFF').attr('class', 'interrupteur-inline pointer');
-	});
-	$('#' + this.id + '_OFF').on('click', function() {
+	}).bind(this));
+	$('#' + this.id + '_OFF').on('click', (function() {
 		localStorage[this.id] = 'false';
 		$('#' + this.id + '_ON').attr('class', 'interrupteur-inline pointer');
 		$('#' + this.id + '_OFF').attr('class', 'interrupteur-inline actif');
-	});
+	}).bind(this));
 };

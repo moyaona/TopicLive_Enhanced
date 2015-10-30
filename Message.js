@@ -1,18 +1,18 @@
 function Message($message)
 {
-	this.id_message = parseInt($message.attr('data-id'), 10);
+	if(TL.estMP) this.id_message = 'MP';
+	else 				 this.id_message = parseInt($message.attr('data-id'), 10);
+
 	this.date = $('.bloc-date-msg', $message).text().replace(/[\r\n]|#[0-9]+$/g, '');
 	this.edition = $message.find('.info-edition-msg').text();
 	this.$message = $message;
 	this.pseudo = $('.bloc-pseudo-msg', $message).text().replace(/[\r\n]/g, '');
 	this.supprime = false;
-
-	// TL.log('new message ' + this.id_message);
 }
 
 Message.prototype.afficher = function()
 {
-	TL.log('message.afficher : ' + this.id_message);
+	TL.log('Affichage du message ' + this.id_message);
 	this.$message.hide();
 	this.fixCitation();
 	replace_spoilers(this.$message[0]);
@@ -29,7 +29,7 @@ Message.prototype.afficher = function()
 
 Message.prototype.fixCitation = function()
 {
-	TL.log('message.fixCitation : ' + this.id_message);
+	TL.log('Obtention de la citation du message ' + this.id_message);
 	this.$message.find('.bloc-options-msg .picto-msg-quote').on('click', (function() {
 		$.ajax({
 			type: 'POST',
@@ -41,9 +41,10 @@ Message.prototype.fixCitation = function()
 			},
 			dataType: 'json',
 			timeout: 5000,
-			success: (function() {
-				this.$message.val(this.$message.val() + '\n\n> Le ' + date + ' ' +
-													pseudo + ' a écrit :\n>' +
+			success: (function(e) {
+				TL.log('Citation du message ' + this.id_message + ' recue avec succes');
+				this.$message.val(this.$message.val() + '\n\n> Le ' + this.date + ' ' +
+													this.pseudo + ' a écrit :\n>' +
 													e.txt.split('\n').join('\n> '));
 			}).bind(this),
 			error: this.fixCitation.bind(this)
@@ -53,8 +54,8 @@ Message.prototype.fixCitation = function()
 
 Message.prototype.maj = function(nvMessage)
 {
-	// TL.log('message.maj : ' + this.id_message);
 	if(this.edition == nvMessage.edition) return;
+	TL.log('Message ' + this.id_message + ' edite : mise a jour');
 
 	this.edition = nvMessage.edition;
 	this.trouver('.bloc-contenu').html(nvMessage.trouver('.bloc-contenu').html());
@@ -67,7 +68,7 @@ Message.prototype.maj = function(nvMessage)
 	}));
 
 	// Clignotement du messages
-	var defColor = $message.css('backgroundColor');
+	var defColor = this.$message.css('backgroundColor');
 	this.$message.animate({
 		backgroundColor: '#FF9900'
 	}, 50);
@@ -78,14 +79,13 @@ Message.prototype.maj = function(nvMessage)
 
 Message.prototype.trouver = function(chose)
 {
-	TL.log('message.trouver : ' + chose);
 	return this.$message.find(chose);
 };
 
 // Change le CSS du message pour indiquer qu'il est supprime
 Message.prototype.supprimer = function()
 {
-	TL.log('message.supprimer : ' + this.id_message);
+	TL.log('Alerte suppression du message ' + this.id_message);
 	if(!this.supprime) {
 		this.trouver('.bloc-options-msg').hide();
 

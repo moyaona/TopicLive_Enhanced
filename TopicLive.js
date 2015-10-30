@@ -8,7 +8,7 @@ function TopicLive()
 
 TopicLive.prototype.ajouterOptions = function()
 {
-	this.log('ajouterOptions()');
+	// this.log('ajouterOptions()');
 	this.options = {
 		optionSon: new TLOption('Son TopicLive', 'topiclive_son')
 	};
@@ -16,7 +16,7 @@ TopicLive.prototype.ajouterOptions = function()
 
 TopicLive.prototype.charger = function()
 {
-  this.log('TL.charger()');
+  // this.log('TL.charger()');
   if(this.oldInstance == this.instance) {
     $('.bloc-header-form').text('Répondre ○');
     $.ajax({
@@ -46,7 +46,7 @@ TopicLive.prototype.charger = function()
 // Sera initialise a chaque changement de page
 TopicLive.prototype.init = function()
 {
-	this.log('init()');
+	this.log('Reinitialisation');
 	if(typeof $ === 'undefined') {
 		return this.log('jQuery introuvable !');
 	}
@@ -69,27 +69,27 @@ TopicLive.prototype.init = function()
 		this.page.scan();
     this.loop();
 	} else {
-		this.log('Aucun message -> TopicLive ne charge rien');
+		this.log('TopicLive sera inactif sur cette page');
 	}
 };
 
 // Ne sera pas initialise a chaque changement de page
 TopicLive.prototype.initStatic = function()
 {
-	this.log('initStatic()');
+	this.log('Premiere initialisation');
 	this.favicon = new Favicon();
 	this.son = new Audio('https://raw.githubusercontent.com/Kiwec/TopicLive/master/notification.ogg');
 
 	this.suivreOnglets();
 	this.init();
 	addEventListener('instantclick:newpage', this.init.bind(this));
-	this.log('FIN INITIALISATION ===================');
+	this.log('Fin de l\'initialisation de TopicLive');
 };
 
 // Transforme une classe chiffree par JvCare en un lien
 TopicLive.prototype.jvCake = function(classe)
 {
-	this.log('jvCake()');
+	// this.log('jvCake()');
 	var base16 = '0A12B34C56D78E9F', lien = '', s = classe.split(' ')[1];
 	for (var i = 0; i < s.length; i += 2) {
 		lien += String.fromCharCode(base16.indexOf(s.charAt(i)) * 16 +
@@ -107,7 +107,7 @@ TopicLive.prototype.log = function(message)
 
 TopicLive.prototype.loop = function()
 {
-	this.log('loop()');
+	// this.log('loop()');
 	if(typeof this.idanalyse !== 'undefined') window.clearTimeout(this.idanalyse);
 
 	var duree = this.ongletActif ? 5000 : 10000;
@@ -117,7 +117,7 @@ TopicLive.prototype.loop = function()
 
 TopicLive.prototype.majUrl = function($bouton)
 {
-	this.log('majUrl()');
+	// this.log('majUrl()');
 	if($bouton.length > 0) {
 		this.messages = [];
 		if($bouton.prop('tagName') == 'A') {
@@ -130,7 +130,7 @@ TopicLive.prototype.majUrl = function($bouton)
 
 TopicLive.prototype.suivreOnglets = function()
 {
-	this.log('suivreOnglets()');
+	this.log('Suivi des onglets active');
 
 	$(window).bind('focus', (function() {
 		if(!this.ongletActif) {
