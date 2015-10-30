@@ -5,6 +5,7 @@ function Favicon()
   this.canvas = $('<canvas>').get(0);
   this.canvas.width = 16;
   this.canvas.height = 16;
+  this.context = this.canvas.getContext('2d');
   this.image = new Image();
   this.image.src = '/favicon.ico';
 
@@ -12,31 +13,36 @@ function Favicon()
   catch(err) { TL.log('### Erreur favicon (init) : ' + err); }
 }
 
+Favicon.prototype.clear = function()
+{
+  this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  this.context.drawImage(this.image, 0, 0);
+};
+
 Favicon.prototype.maj = function(txt)
 {
-  // TL.log('favicon.maj : ' + txt);
-  var ctx = this.canvas.getContext('2d');
-  var textWidth = ctx.measureText(txt).width;
-  ctx.drawImage(this.image, 0, 0);
-
+  this.clear();
+  
   if(txt !== '')
   {
-    ctx.fillStyle = 'red';
-    ctx.fillRect(0, 0, textWidth + 3, 11);
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 10px Verdana';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText(txt, 1, 11);
+    this.context.fillStyle = 'red';
+    this.context.fillRect(0, 0, this.context.measureText(txt).width + 3, 11);
+    this.context.fillStyle = 'white';
+    this.context.font = 'bold 10px Verdana';
+    this.context.textBaseline = 'bottom';
+    this.context.fillText(txt, 1, 11);
   }
 
-  var newFavicon = this.canvas.toDataURL('image/png');
+  this.replace();
+};
 
+Favicon.prototype.replace = function()
+{
   if(typeof this.lien !== 'undefined') this.lien.remove();
   this.lien = $('<link>', {
-    href: newFavicon,
+    href: this.canvas.toDataURL('image/png'),
     rel: 'shortcut icon',
     type: 'image/png'
   });
-
   $('head').append(this.lien);
 };
