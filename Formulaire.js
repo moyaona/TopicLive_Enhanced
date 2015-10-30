@@ -5,10 +5,11 @@ function Formulaire()
   this.forcerMaj = false;
 }
 
-// note : a cause d'un bug inconnu j'utilise TL.formu au lieu de this
 Formulaire.prototype.envoyer = function()
 {
   TL.log('formu.envoyer()');
+
+  // Si le message est invalide selon JVC
   if(typeof e !== 'undefined' && e.erreurs.length !== 0) {
     var message_erreur = '';
     for(var i = 0; i < e.erreurs.length; i++) {
@@ -22,20 +23,19 @@ Formulaire.prototype.envoyer = function()
     }
   } else {
     TL.log('Envoi du message...');
-    TL.formu.trouver('.btn-poster-msg').attr('disabled', 'disabled');
-    TL.formu.trouver('.conteneur-editor').fadeOut();
-    console.log(TL.formu.obtenirFormulaire().serializeArray()); // TEMP
+    this.trouver('.btn-poster-msg').attr('disabled', 'disabled');
+    this.trouver('.conteneur-editor').fadeOut();
     $.ajax({
       type: 'POST',
       url: TL.url,
-      data: TL.formu.obtenirFormulaire().serializeArray(),
+      data: this.obtenirFormulaire().serializeArray(),
       timeout: 5000,
-      success: function(data) {
+      success: (function(data) {
         TL.log('Page de retour recue avec succes.');
         var nvPage = new Page($(data.substring(data.indexOf('<!DOCTYPE html>'))));
-        TL.formu.forcerMaj = true;
+        this.forcerMaj = true;
         nvPage.scan();
-      },
+      }).bind(this),
       error: function() {
         try {
           modal('message', {message:'Erreur lors de l\'envoi du message.'});
@@ -73,7 +73,7 @@ Formulaire.prototype.maj = function($nvform)
   }
 
   $form.off('submit');
-  $form.on('submit', this.verifMessage);
+  $form.on('submit', this.verifMessage.bind(this));
   TL.log('formulaire.maj() : done');
 };
 
@@ -98,27 +98,26 @@ Formulaire.prototype.obtenirFormulaire = function($page)
   return $page.find(TL.estMP ? '.form-post-topic' : '.form-post-message');
 };
 
-// note : a cause d'un bug inconnu j'utilise TL.formu au lieu de this
 Formulaire.prototype.verifMessage = function()
 {
   TL.log('formulaire.verifEnvoi()');
 
   if(TL.estMP) {
-    TL.formu.envoyer();
+    this.envoyer();
   } else {
     $.ajax({
       type: 'POST',
       url: '/forums/ajax_check_poste_message.php',
       data: {
         id_topic: id_topic, // global
-        new_message: TL.formu.obtenirMessage().val(),
+        new_message: this.obtenirMessage().val(),
         ajax_timestamp: TL.ajaxTs,
         ajax_hash: TL.ajaxHash
       },
       dataType: 'json',
       timeout: 5000,
-      success: TL.formu.envoyer,
-      error: TL.formu.verifMessage
+      success: this.envoyer.bind(this),
+      error: this.verifMessage.bind(this)
     });
   }
 

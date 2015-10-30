@@ -30,8 +30,7 @@ Message.prototype.afficher = function()
 Message.prototype.fixCitation = function()
 {
 	TL.log('message.fixCitation : ' + this.id_message);
-	var $msg = this.obtenirMessage();
-	this.$message.find('.bloc-options-msg .picto-msg-quote').on('click', function() {
+	this.$message.find('.bloc-options-msg .picto-msg-quote').on('click', (function() {
 		$.ajax({
 			type: 'POST',
 			url: '/forums/ajax_citation.php',
@@ -42,13 +41,14 @@ Message.prototype.fixCitation = function()
 			},
 			dataType: 'json',
 			timeout: 5000,
-			success: function() {
-				$msg.val($msg.val() + '\n\n> Le ' + date + ' ' + pseudo +
-					' a écrit :\n>' + e.txt.split('\n').join('\n> '));
-			},
-			error: this.fixCitation
+			success: (function() {
+				this.$message.val(this.$message.val() + '\n\n> Le ' + date + ' ' +
+													pseudo + ' a écrit :\n>' +
+													e.txt.split('\n').join('\n> '));
+			}).bind(this),
+			error: this.fixCitation.bind(this)
 		});
-	});
+	}).bind(this));
 };
 
 Message.prototype.maj = function(nvMessage)

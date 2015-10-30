@@ -1,7 +1,7 @@
 function TopicLive()
 {
 	this.log('Initialisation.');
-	this.debug = false;
+	this.debug = true;
 	this.instance = 0;
 	this.ongletActif = true;
 }
@@ -9,31 +9,38 @@ function TopicLive()
 TopicLive.prototype.ajouterOptions = function()
 {
 	this.log('ajouterOptions()');
-	this.optionSon = new TLOption('Son TopicLive', 'topiclive_son');
+	this.options = {
+		optionSon: new TLOption('Son TopicLive', 'topiclive_son')
+	};
 };
 
 TopicLive.prototype.charger = function()
 {
-  TL.log('TL.charger()');
-  if(TL.oldInstance == TL.instance) {
+  this.log('TL.charger()');
+  if(this.oldInstance == this.instance) {
     $('.bloc-header-form').text('Répondre ○');
     $.ajax({
       type: 'GET',
-      url: TL.url,
+      url: this.url,
       timeout: 5000,
-      success: function(data) {
-        if(TL.oldInstance == TL.instance) {
+      success: (function(data) {
+        if(this.oldInstance == this.instance)
+				{
           $('.bloc-header-form').text('Répondre ●');
           new Page($(data.substring(data.indexOf('<!DOCTYPE html>')))).scan();
-          setTimeout(function() {
+          setTimeout((function() {
             $('.bloc-header-form').text('Répondre');
-            TL.loop();
-          }, 100);
-        } else TL.log('Nouvelle instance detectee : arret du chargement');
-      },
-      error: TL.loop
+            this.loop();
+          }).bind(this), 100);
+        } else {
+					this.log('Nouvelle instance detectee : arret du chargement');
+				}
+      }).bind(this),
+      error: this.loop.bind(this)
     });
-  } else TL.log('Nouvelle instance detectee : arret du chargement');
+  } else {
+		this.log('Nouvelle instance detectee : arret du chargement');
+	}
 };
 
 // Sera initialise a chaque changement de page
@@ -75,7 +82,7 @@ TopicLive.prototype.initStatic = function()
 
 	this.suivreOnglets();
 	this.init();
-	addEventListener('instantclick:newpage', this.init);
+	addEventListener('instantclick:newpage', this.init.bind(this));
 	this.log('FIN INITIALISATION ===================');
 };
 
@@ -102,8 +109,10 @@ TopicLive.prototype.loop = function()
 {
 	this.log('loop()');
 	if(typeof this.idanalyse !== 'undefined') window.clearTimeout(this.idanalyse);
+
+	var duree = this.ongletActif ? 5000 : 10000;
 	this.oldInstance = this.instance;
-	this.idanalyse = setTimeout(this.charger, this.ongletActif ? 5000 : 10000);
+	this.idanalyse = setTimeout(this.charger.bind(this), duree);
 };
 
 TopicLive.prototype.majUrl = function($bouton)
@@ -123,20 +132,18 @@ TopicLive.prototype.suivreOnglets = function()
 {
 	this.log('suivreOnglets()');
 
-	$(window).bind('focus', function() {
-		if(!TL.ongletActif) {
-			//TL.log('focus');
-			TL.ongletActif = true;
-			TL.favicon.maj('');
-			TL.nvxMessages = 0;
+	$(window).bind('focus', (function() {
+		if(!this.ongletActif) {
+			this.ongletActif = true;
+			this.favicon.maj('');
+			this.nvxMessages = 0;
 		}
-	});
-	$(window).bind('blur', function() {
-		if(TL.ongletActif) {
-			//TL.log('blur');
-			TL.ongletActif = false;
-			TL.favicon.maj('');
-			TL.nvxMessages = 0;
+	}).bind(this));
+	$(window).bind('blur', (function() {
+		if(this.ongletActif) {
+			this.ongletActif = false;
+			this.favicon.maj('');
+			this.nvxMessages = 0;
 		}
-	});
+	}).bind(this));
 };
