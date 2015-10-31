@@ -43,9 +43,9 @@ Message.prototype.fixCitation = function()
 			timeout: 5000,
 			success: (function(e) {
 				TL.log('Citation du message ' + this.id_message + ' recue avec succes');
-				this.$message.val(this.$message.val() + '\n\n> Le ' + this.date + ' ' +
-													this.pseudo + ' a écrit :\n>' +
-													e.txt.split('\n').join('\n> '));
+				var $msg = TL.formu.obtenirMessage();
+				$msg.val($msg.val() + '\n\n> Le ' + this.date + ' ' + this.pseudo +
+								 ' a écrit :\n>' + e.txt.split('\n').join('\n> '));
 			}).bind(this),
 			error: this.fixCitation.bind(this)
 		});
