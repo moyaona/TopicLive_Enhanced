@@ -45,8 +45,8 @@ Message.prototype.fixCitation = function()
 				TL.log('Citation du message ' + this.id_message + ' recue avec succes');
 				var $msg = TL.formu.obtenirMessage();
 				var nvmsg = '> Le ' + this.date + ' ' + this.pseudo + ' a écrit :\n>';
-				nvmsg += e.txt.split('\n').join('\n> ') + '\n\n');
-				if($msg.val() == '') {
+				nvmsg += e.txt.split('\n').join('\n> ') + '\n\n';
+				if($msg.val() === '') {
 					$msg.val(nvmsg);
 				} else {
 					$msg.val($msg.val() + '\n\n' + nvmsg);

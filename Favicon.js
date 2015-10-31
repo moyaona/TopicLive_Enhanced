@@ -22,7 +22,7 @@ Favicon.prototype.clear = function()
 Favicon.prototype.maj = function(txt)
 {
   this.clear();
-  
+
   if(txt !== '')
   {
     this.context.fillStyle = 'red';
