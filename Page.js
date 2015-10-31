@@ -38,6 +38,8 @@ Page.prototype.scan = function()
   TL.ajaxHash = this.trouver('#ajax_hash_liste_messages').val();
   TL.formu.maj(TL.formu.obtenirFormulaire(this.$page).clone());
 
+  var maj = false;
+
   // Liste de messages
   var nvMsgs = this.obtenirMessages();
 
@@ -78,10 +80,11 @@ Page.prototype.scan = function()
       TL.messages.push(nvMsgs[k]);
       TL.nvxMessages++;
       nvMsgs[k].afficher();
+      maj = true;
     }
   }
 
-  if(TL.nvxMessages > 0) {
+  if(maj) {
     this.maj();
     TL.formu.forcerMaj = false;
   } else {
