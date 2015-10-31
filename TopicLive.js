@@ -1,7 +1,7 @@
 function TopicLive()
 {
 	this.log('Initialisation.');
-	this.debug = true;
+	this.debug = false;
 	this.instance = 0;
 	this.ongletActif = true;
 }
