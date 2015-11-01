@@ -76,13 +76,16 @@ Page.prototype.scan = function()
       }
     }
     if(nv) {
-      // TL.log('Nouveau message !');
+      TL.log('Nouveau message !');
       TL.messages.push(nvMsgs[k]);
       TL.nvxMessages++;
       nvMsgs[k].afficher();
       maj = true;
     }
   }
+
+  // Doit etre avant TL.charger()
+  TL.majUrl(this);
 
   if(maj) {
     this.maj();
@@ -92,7 +95,7 @@ Page.prototype.scan = function()
     if(TL.formu.forcerMaj) TL.charger();
   }
 
-  TL.majUrl(this.trouver('.pagi-fin-actif'));
+  TL.loop();
 };
 
 Page.prototype.trouver = function(chose)

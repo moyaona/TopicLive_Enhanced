@@ -30,7 +30,6 @@ TopicLive.prototype.charger = function()
           new Page($(data.substring(data.indexOf('<!DOCTYPE html>')))).scan();
           setTimeout((function() {
             $('.bloc-header-form').text('Répondre');
-            this.loop();
           }).bind(this), 100);
         } else {
 					this.log('Nouvelle instance detectee : arret du chargement');
@@ -115,16 +114,28 @@ TopicLive.prototype.loop = function()
 	this.idanalyse = setTimeout(this.charger.bind(this), duree);
 };
 
-TopicLive.prototype.majUrl = function($bouton)
+TopicLive.prototype.majUrl = function(page)
 {
 	// this.log('majUrl()');
+	var $bouton = page.trouver('.pagi-fin-actif');
+	var numPage = page.trouver('.page-active:first').text();
+	var testUrl = this.url.split('-');
+
+	// Si le bouton page suivante est present
 	if($bouton.length > 0) {
+		TL.log('Nouvelle URL (loop)');
 		this.messages = [];
 		if($bouton.prop('tagName') == 'A') {
 			this.url = $bouton.attr('href');
 		} else {
 			this.url = this.jvCake($bouton.attr('class'));
 		}
+	// Si la page n'est pas la meme (ex. post d'un message sur nouvelle page)
+	} else if(testUrl[3] != numPage) {
+		TL.log('Nouvelle URL (formulaire)');
+		this.messages = [];
+		testUrl[3] = numPage;
+		this.url = testUrl.join('-');
 	}
 };
 

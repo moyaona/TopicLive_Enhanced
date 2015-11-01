@@ -5,7 +5,7 @@ function Formulaire()
   this.forcerMaj = false;
 }
 
-Formulaire.prototype.envoyer = function()
+Formulaire.prototype.envoyer = function(e)
 {
   // Si le message est invalide selon JVC
   if(typeof e !== 'undefined' && e.erreurs.length !== 0) {
@@ -22,15 +22,24 @@ Formulaire.prototype.envoyer = function()
     TL.log('Message valide. Envoi en cours');
     this.trouver('.btn-poster-msg').attr('disabled', 'disabled');
     this.trouver('.conteneur-editor').fadeOut();
+
+    window.clearTimeout(TL.idanalyse);
     $.ajax({
       type: 'POST',
       url: TL.url,
       data: this.obtenirFormulaire().serializeArray(),
       timeout: 5000,
       success: (function(data) {
-        TL.log('Message envoye avec succes');
         var nvPage = new Page($(data.substring(data.indexOf('<!DOCTYPE html>'))));
         this.forcerMaj = true;
+
+        var $formu = this.obtenirFormulaire(nvPage.$page);
+        if($formu.find('.alert-danger').length !== 0) {
+          this.maj($formu);
+          this.forcerMaj = false;
+        }
+
+        TL.majUrl(nvPage);
         nvPage.scan();
       }).bind(this),
       error: function() {
@@ -48,18 +57,30 @@ Formulaire.prototype.maj = function($nvform)
   var $cap = this.obtenirCaptcha($form);
   var $ncap = this.obtenirCaptcha($nvform);
 
+  // Si on doit maj le formulaire
   if(this.forcerMaj || ($cap.length != $ncap.length && $cap.find('#code_captcha').val() === '')) {
     TL.log('Maj data formulaire !');
+
+    // Remplacement hashs formulaire
     this.trouver('input[type="hidden"]').remove();
     $nvform.find('input[type="hidden"]').each(function() {
       TL.log($(this).attr('name') + ':' + $(this).attr('value'));
       $form.append($(this));
     });
+
+    // Reactivation des boutons
     this.trouver('.btn-poster-msg').removeAttr('disabled');
     this.trouver('.conteneur-editor').fadeIn();
-    $cap.remove(); // suppression du captcha
-    this.trouver('.jv-editor').after($ncap); // remplacement du captcha
 
+    // Remplacement du captcha
+    $cap.remove();
+    this.trouver('.jv-editor').after($ncap);
+
+    // Maj banniere erreur
+    this.trouver('.alert-danger').remove();
+    this.trouver('.row:first').before($nvform.find('.alert-danger'));
+
+    // Remplacement du message (JVC n'effacera pas le message en erreur)
     if(this.forcerMaj) {
       this.obtenirMessage().val(this.obtenirMessage($nvform).val());
     }
