@@ -18,10 +18,12 @@ Page.prototype.obtenirMessages = function()
 Page.prototype.maj = function()
 {
   TL.log('Nouveaux messages ! Execution favicon/son/spoilers');
+  if(localStorage.topiclive_son == 'true') {
+    try { TL.son.play(); }
+    catch(err) { TL.log('### Erreur son : ' + err); }
+  }
   try { if(!TL.ongletActif) TL.favicon.maj('' + TL.nvxMessages); }
   catch(err) { TL.log('### Erreur favicon (maj) : ' + err); }
-  try { TL.son.play(); }
-  catch(err) { TL.log('### Erreur son : ' + err); }
   try { jsli.Transformation(); }
   catch(err) { TL.log('### Erreur jsli.Transformation() : ' + err); }
 
