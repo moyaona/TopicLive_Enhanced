@@ -38,8 +38,18 @@ Page.prototype.scan = function()
   TL.log('Scan de la page');
   TL.ajaxTs = this.trouver('#ajax_timestamp_liste_messages').val();
   TL.ajaxHash = this.trouver('#ajax_hash_liste_messages').val();
-  TL.formu.maj(TL.formu.obtenirFormulaire(this.$page).clone());
 
+  if(localStorage.tl_connectes == 'true') {
+    $('.nb-connect-fofo').text(this.trouver('.nb-connect-fofo').text());
+  }
+
+  if($('.conteneur-message').length === 0 || $('.pagi-fin-actif').length !== 0) {
+    TL.log('Pas sur une derniere page : loop');
+    TL.loop();
+    return;
+  }
+
+  TL.formu.maj(TL.formu.obtenirFormulaire(this.$page).clone());
   var maj = false;
 
   // Liste de messages

@@ -10,7 +10,8 @@ TopicLive.prototype.ajouterOptions = function()
 {
 	// this.log('ajouterOptions()');
 	this.options = {
-		optionSon: new TLOption('Son TopicLive', 'topiclive_son')
+		optionSon: new TLOption('Son TopicLive', 'topiclive_son'),
+		optionConnectes: new TLOption('Rechargement des connectés', 'tl_connectes')
 	};
 };
 
@@ -58,8 +59,8 @@ TopicLive.prototype.init = function()
 
 	this.ajouterOptions();
 
-	// Si il y a des messages dans la page et on est en derniere page
-	if($('.conteneur-message').length > 0 && $('.pagi-fin-actif').length === 0) {
+	// Si on est sur les forums
+	if(document.URL.match(/\/forums\//)) {
 		this.log('Il y a des messages dans la page. INITIALISATION ==============');
 		this.page = new Page($(document));
 		this.formu = new Formulaire();
