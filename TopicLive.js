@@ -10,8 +10,7 @@ TopicLive.prototype.ajouterOptions = function()
 {
 	// this.log('ajouterOptions()');
 	this.options = {
-		optionSon: new TLOption('Son TopicLive', 'topiclive_son'),
-		optionConnectes: new TLOption('Rechargement des connectés', 'tl_connectes')
+		optionSon: new TLOption('Son TopicLive', 'topiclive_son')
 	};
 };
 

@@ -39,9 +39,8 @@ Page.prototype.scan = function()
   TL.ajaxTs = this.trouver('#ajax_timestamp_liste_messages').val();
   TL.ajaxHash = this.trouver('#ajax_hash_liste_messages').val();
 
-  if(localStorage.tl_connectes == 'true') {
-    $('.nb-connect-fofo').text(this.trouver('.nb-connect-fofo').text());
-  }
+  // Maj du nombre de connectes
+  $('.nb-connect-fofo').text(this.trouver('.nb-connect-fofo').text());
 
   if($('.conteneur-message').length === 0 || $('.pagi-fin-actif').length !== 0) {
     TL.log('Pas sur une derniere page : loop');
