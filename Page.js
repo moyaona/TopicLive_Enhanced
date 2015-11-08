@@ -54,13 +54,17 @@ Page.prototype.scan = function()
 
   // Liste de messages
   var nvMsgs = this.obtenirMessages();
+  var anciensMsgs = TL.messages;
 
   TL.log('Verification des messages supprimes');
+  try {
   if(!TL.estMP) {
-    for(var i in TL.messages) {
+    for(var i in anciensMsgs) {
+      if(!anciensMsgs.hasOwnProperty(i)) continue; // fix chrome
       var supprimer = true;
       for(var j in nvMsgs) {
-        if(TL.messages[i].id_message == nvMsgs[j].id_message) {
+        if(!nvMsgs.hasOwnProperty(j)) continue; // fix chrome
+        if(anciensMsgs[i].id_message == nvMsgs[j].id_message) {
           supprimer = false;
           break;
         }
@@ -68,21 +72,25 @@ Page.prototype.scan = function()
       if(supprimer) TL.messages[i].supprimer();
     }
   }
+  } catch(err) { TL.log('### Erreur messages supprimes : ' + err); }
 
   TL.log('Verification des nouveaux messages et editions');
+  try {
   var estMP = TL.estMP;
   for(var k in nvMsgs) {
+    if(!nvMsgs.hasOwnProperty(k)) continue; // fix chrome
     var nv = true;
-    for(var l in TL.messages) {
+    for(var l in anciensMsgs) {
+      if(!anciensMsgs.hasOwnProperty(l)) continue; // fix chrome
       if(TL.estMP) {
-        if(TL.messages[l].$message.text() == nvMsgs[k].$message.text()) {
+        if(anciensMsgs[l].$message.text() == nvMsgs[k].$message.text()) {
           nv = false;
           break;
         }
       } else {
-        if(TL.messages[l].id_message == nvMsgs[k].id_message) {
+        if(anciensMsgs[l].id_message == nvMsgs[k].id_message) {
           nv = false;
-          TL.messages[l].maj(nvMsgs[k]);
+          anciensMsgs[l].update(nvMsgs[k]);
           break;
         }
       }
@@ -95,6 +103,7 @@ Page.prototype.scan = function()
       maj = true;
     }
   }
+  } catch(err) { TL.log('Erreur nouveaux messages : ' + err); }
 
   // Doit etre avant TL.charger()
   TL.majUrl(this);
