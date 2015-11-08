@@ -54,13 +54,16 @@ Page.prototype.scan = function()
 
   // Liste de messages
   var nvMsgs = this.obtenirMessages();
+  var anciensMsgs = TL.messages;
 
   TL.log('Verification des messages supprimes');
   if(!TL.estMP) {
-    for(var i in TL.messages) {
+    for(var i in anciensMsgs) {
+      if(!anciensMsgs.hasOwnProperty(i)) continue; // fix chrome
       var supprimer = true;
       for(var j in nvMsgs) {
-        if(TL.messages[i].id_message == nvMsgs[j].id_message) {
+        if(!nvMsgs.hasOwnProperty(j)) continue; // fix chrome
+        if(anciensMsgs[i].id_message == nvMsgs[j].id_message) {
           supprimer = false;
           break;
         }
@@ -71,8 +74,8 @@ Page.prototype.scan = function()
 
   TL.log('Verification des nouveaux messages et editions');
   var estMP = TL.estMP;
-  var anciensMsgs = TL.messages;
   for(var k in nvMsgs) {
+    if(!nvMsgs.hasOwnProperty(k)) continue; // fix chrome
     var nv = true;
     for(var l in anciensMsgs) {
       if(!anciensMsgs.hasOwnProperty(l)) continue; // fix chrome
@@ -84,9 +87,7 @@ Page.prototype.scan = function()
       } else {
         if(anciensMsgs[l].id_message == nvMsgs[k].id_message) {
           nv = false;
-          console.log(anciensMsgs[l]);
-          try { anciensMsgs[l].update(nvMsgs[k]); }
-          catch(err) { console.log(err); }
+          anciensMsgs[l].update(nvMsgs[k]);
           break;
         }
       }
