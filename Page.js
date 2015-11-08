@@ -75,6 +75,7 @@ Page.prototype.scan = function()
   for(var k in nvMsgs) {
     var nv = true;
     for(var l in anciensMsgs) {
+      if(!anciensMsgs.hasOwnProperty(l)) continue; // fix chrome
       if(TL.estMP) {
         if(anciensMsgs[l].$message.text() == nvMsgs[k].$message.text()) {
           nv = false;
