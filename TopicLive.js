@@ -59,8 +59,8 @@ TopicLive.prototype.init = function()
 
 	this.ajouterOptions();
 
-	// Si on est sur les forums
-	if(document.URL.match(/\/forums\//)) {
+	// Si on est sur les forums ou en MP
+	if(document.URL.match(/\/forums\//) || document.URL.match(/\/messages-prives\//)) {
 		this.log('Il y a des messages dans la page. INITIALISATION ==============');
 		this.page = new Page($(document));
 		this.formu = new Formulaire();
