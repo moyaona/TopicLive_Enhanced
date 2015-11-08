@@ -57,6 +57,7 @@ Page.prototype.scan = function()
   var anciensMsgs = TL.messages;
 
   TL.log('Verification des messages supprimes');
+  try {
   if(!TL.estMP) {
     for(var i in anciensMsgs) {
       if(!anciensMsgs.hasOwnProperty(i)) continue; // fix chrome
@@ -71,8 +72,10 @@ Page.prototype.scan = function()
       if(supprimer) TL.messages[i].supprimer();
     }
   }
+  } catch(err) { TL.log('### Erreur messages supprimes : ' + err); }
 
   TL.log('Verification des nouveaux messages et editions');
+  try {
   var estMP = TL.estMP;
   for(var k in nvMsgs) {
     if(!nvMsgs.hasOwnProperty(k)) continue; // fix chrome
@@ -100,6 +103,7 @@ Page.prototype.scan = function()
       maj = true;
     }
   }
+  } catch(err) { TL.log('Erreur nouveaux messages : ' + err); }
 
   // Doit etre avant TL.charger()
   TL.majUrl(this);
