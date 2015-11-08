@@ -83,6 +83,7 @@ Page.prototype.scan = function()
       } else {
         if(anciensMsgs[l].id_message == nvMsgs[k].id_message) {
           nv = false;
+          console.log(anciensMsgs[l]);
           try { anciensMsgs[l].update(nvMsgs[k]); }
           catch(err) { console.log(err); }
           break;
