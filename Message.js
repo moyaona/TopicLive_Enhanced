@@ -58,31 +58,6 @@ Message.prototype.fixCitation = function()
 	}).bind(this));
 };
 
-Message.prototype.maj = function(nvMessage)
-{
-	if(this.edition == nvMessage.edition) return;
-	TL.log('Message ' + this.id_message + ' edite : mise a jour');
-
-	this.edition = nvMessage.edition;
-	this.trouver('.bloc-contenu').html(nvMessage.trouver('.bloc-contenu').html());
-
-	dispatchEvent(new CustomEvent('topiclive:edition', {
-		'detail': {
-			id: this.id_message,
-			jvcake: TL.jvCake
-		}
-	}));
-
-	// Clignotement du messages
-	var defColor = this.$message.css('backgroundColor');
-	this.$message.animate({
-		backgroundColor: '#FF9900'
-	}, 50);
-	this.$message.animate({
-		backgroundColor: defColor
-	}, 500);
-};
-
 Message.prototype.trouver = function(chose)
 {
 	return this.$message.find(chose);
@@ -105,4 +80,29 @@ Message.prototype.supprimer = function()
 
 		this.supprime = true;
 	}
+};
+
+Message.prototype.update = function(nvMessage)
+{
+	if(this.edition == nvMessage.edition) return;
+	TL.log('Message ' + this.id_message + ' edite : mise a jour');
+
+	this.edition = nvMessage.edition;
+	this.trouver('.bloc-contenu').html(nvMessage.trouver('.bloc-contenu').html());
+
+	dispatchEvent(new CustomEvent('topiclive:edition', {
+		'detail': {
+			id: this.id_message,
+			jvcake: TL.jvCake
+		}
+	}));
+
+	// Clignotement du messages
+	var defColor = this.$message.css('backgroundColor');
+	this.$message.animate({
+		backgroundColor: '#FF9900'
+	}, 50);
+	this.$message.animate({
+		backgroundColor: defColor
+	}, 500);
 };
