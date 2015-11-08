@@ -71,18 +71,19 @@ Page.prototype.scan = function()
 
   TL.log('Verification des nouveaux messages et editions');
   var estMP = TL.estMP;
+  var anciensMsgs = TL.messages;
   for(var k in nvMsgs) {
     var nv = true;
-    for(var l in TL.messages) {
+    for(var l in anciensMsgs) {
       if(TL.estMP) {
-        if(TL.messages[l].$message.text() == nvMsgs[k].$message.text()) {
+        if(anciensMsgs[l].$message.text() == nvMsgs[k].$message.text()) {
           nv = false;
           break;
         }
       } else {
-        if(TL.messages[l].id_message == nvMsgs[k].id_message) {
+        if(anciensMsgs[l].id_message == nvMsgs[k].id_message) {
           nv = false;
-          TL.messages[l].maj(nvMsgs[k]);
+          anciensMsgs[l].maj(nvMsgs[k]);
           break;
         }
       }
