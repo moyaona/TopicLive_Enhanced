@@ -131,7 +131,7 @@ TopicLive.prototype.majUrl = function(page)
 			this.url = this.jvCake($bouton.attr('class'));
 		}
 	// Si la page n'est pas la meme (ex. post d'un message sur nouvelle page)
-	} else if(testUrl[3] != numPage) {
+} else if(testUrl[3] != numPage) {
 		TL.log('Nouvelle URL (formulaire)');
 		this.messages = [];
 		testUrl[3] = numPage;

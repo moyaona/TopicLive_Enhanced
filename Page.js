@@ -44,6 +44,7 @@ Page.prototype.scan = function()
 
   if($('.conteneur-message').length === 0 || $('.pagi-fin-actif').length !== 0) {
     TL.log('Pas sur une derniere page : loop');
+    TL.majUrl(this);
     TL.loop();
     return;
   }
