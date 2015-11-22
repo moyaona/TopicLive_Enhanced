@@ -8,7 +8,7 @@ Page.prototype.obtenirMessages = function()
 {
   // TL.log('page.obtenirMessages()');
   var msgs = [];
-  this.trouver('.bloc-message-forum').each(function() {
+  this.trouver('.bloc-message-forum:not(.msg-pseudo-blacklist)').each(function() {
     msgs.push(new Message($(this)));
   });
   return msgs;
