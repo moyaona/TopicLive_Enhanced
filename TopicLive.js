@@ -47,20 +47,20 @@ TopicLive.prototype.init = function()
 {
 	this.log('Reinitialisation');
 	if(typeof $ === 'undefined') {
-		return this.log('jQuery introuvable !');
+		return this.log('### jQuery introuvable !');
 	}
 
 	this.instance++;
 	this.ajaxTs = $('#ajax_timestamp_liste_messages').val();
 	this.ajaxHash = $('#ajax_hash_liste_messages').val();
   this.estMP = $('#mp-page').length;
-	this.url = document.URL;
+	this.url = this.estMP ? document.URL.substring(0, document.URL.indexOf('&')) : document.URL;
 
 	this.ajouterOptions();
 
 	// Si on est sur les forums ou en MP
 	if(document.URL.match(/\/forums\//) || document.URL.match(/\/messages-prives\//)) {
-		this.log('Il y a des messages dans la page. INITIALISATION ==============');
+		this.log('Il y a des messages dans la page.');
 		this.page = new Page($(document));
 		this.formu = new Formulaire();
 		this.messages = this.page.obtenirMessages();
@@ -117,6 +117,8 @@ TopicLive.prototype.loop = function()
 TopicLive.prototype.majUrl = function(page)
 {
 	// this.log('majUrl()');
+	if(this.estMP) return;
+
 	var $bouton = page.trouver('.pagi-fin-actif');
 	var numPage = page.trouver('.page-active:first').text();
 	var testUrl = this.url.split('-');
