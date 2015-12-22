@@ -1,6 +1,6 @@
 function Page($page)
 {
-  // TL.log('Nouvelle page.');
+  TL.log('Nouvelle page.');
   this.$page = $page;
 }
 
@@ -76,14 +76,20 @@ Page.prototype.scan = function()
 
   TL.log('Verification des nouveaux messages et editions');
   try {
-  var estMP = TL.estMP;
   for(var k in nvMsgs) {
     if(!nvMsgs.hasOwnProperty(k)) continue; // fix chrome
     var nv = true;
     for(var l in anciensMsgs) {
       if(!anciensMsgs.hasOwnProperty(l)) continue; // fix chrome
       if(TL.estMP) {
-        if(anciensMsgs[l].$message.text() == nvMsgs[k].$message.text()) {
+        if(anciensMsgs[l].trouver('.bloc-spoil-jv').length !== 0) {
+	var ancienneDate = anciensMsgs[l].trouver('.bloc-date-msg').text();
+        var nouvelleDate = nvMsgs[k].trouver('.bloc-date-msg').text();
+        if(ancienneDate == nouvelleDate) {
+            nv = false;
+            break;
+          }
+        } else if(anciensMsgs[l].$message.text() == nvMsgs[k].$message.text()) {
           nv = false;
           break;
         }
@@ -113,7 +119,7 @@ Page.prototype.scan = function()
     TL.formu.forcerMaj = false;
   } else {
     TL.log('Aucun nouveau message.');
-    if(TL.formu.forcerMaj) TL.charger();
+    if(TL.formu.forcerMaj) setTimeout(TL.charger.bind(TL), 1000);
   }
 
   TL.loop();

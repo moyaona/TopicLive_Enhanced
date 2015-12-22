@@ -1,7 +1,22 @@
 // Code de Spawnkill
 function Favicon()
 {
-  // TL.log('new favicon');
+  try {
+    this.init();
+  } catch(err) {
+    TL.log('### Erreur init favicon : ' + err);
+  }
+}
+
+Favicon.prototype.clear = function()
+{
+  this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  this.context.drawImage(this.image, 0, 0);
+};
+
+Favicon.prototype.init = function()
+{
+  TL.log('Initialisation du Favicon');
   this.canvas = $('<canvas>').get(0);
   this.canvas.width = 16;
   this.canvas.height = 16;
@@ -11,12 +26,6 @@ function Favicon()
 
   try { this.maj(''); }
   catch(err) { TL.log('### Erreur favicon (init) : ' + err); }
-}
-
-Favicon.prototype.clear = function()
-{
-  this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  this.context.drawImage(this.image, 0, 0);
 };
 
 Favicon.prototype.maj = function(txt)
