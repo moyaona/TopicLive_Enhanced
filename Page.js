@@ -141,16 +141,16 @@ Page.prototype.Transformation = function () {
 
     $span.replaceWith('<a href="' + href + '" class="' + classes + '">' +
                       $span.html() + '</a>');
+  });
 
-    // Fix temporaire des avatars
-    $span.children().each(function () {
-      var $elem = $(this);
-      var newsrc = $elem.attr('data-srcset');
-      if(newsrc != 'undefined') {
-        $elem.attr('src', newsrc);
-        $elem.removeAttr('data-srcset');
-      }
-    });
+  // Fix temporaire des avatars
+  $('.user-avatar-msg').each(function () {
+    var $elem = $(this);
+    var newsrc = $elem.attr('data-srcset');
+    if(newsrc != 'undefined') {
+      $elem.attr('src', newsrc);
+      $elem.removeAttr('data-srcset');
+    }
   });
 }
 

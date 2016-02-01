@@ -12,7 +12,7 @@
 // @require Option.js
 // @require Page.js
 // @require TopicLive.js
-// @version 5.1.1
+// @version 5.1.2
 // @grant none
 // @noframes
 // ==/UserScript==

@@ -86,9 +86,12 @@ Formulaire.prototype.maj = function($nvform)
     }
   }
 
-  $form.off('submit');
-  $form.on('submit', this.verifMessage.bind(this));
-  // TL.log('Mise a jour du formulaire terminee');
+  // Remplacement du bouton de post
+  $bouton = $form.find('.btn-poster-msg');
+  $bouton.off();
+  $bouton.removeAttr('data-push');
+  $bouton.attr('type', 'button');
+  $bouton.on('click', this.verifMessage.bind(this));
 };
 
 Formulaire.prototype.obtenirCaptcha = function($form)
