@@ -18,7 +18,7 @@ TopicLive.prototype.charger = function()
 {
   // this.log('TL.charger()');
   if(this.oldInstance == this.instance) {
-    $('.titre-bloc').text('Répondre ○');
+    $('.titre-bloc:last').text('Répondre ○');
     $.ajax({
       type: 'GET',
       url: this.url,
@@ -26,10 +26,10 @@ TopicLive.prototype.charger = function()
       success: (function(data) {
         if(this.oldInstance == this.instance)
 	{
-          $('.titre-bloc').text('Répondre ●');
+          $('.titre-bloc:last').text('Répondre ●');
           new Page($(data.substring(data.indexOf('<!DOCTYPE html>')))).scan();
           setTimeout((function() {
-            $('.titre-bloc').text('Répondre');
+            $('.titre-bloc:last').text('Répondre');
           }).bind(this), 100);
         } else {
 	  this.log('Nouvelle instance detectee : arret du chargement');
