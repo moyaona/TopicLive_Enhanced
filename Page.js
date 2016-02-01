@@ -24,7 +24,7 @@ Page.prototype.maj = function()
   }
   try { if(!TL.ongletActif) TL.favicon.maj('' + TL.nvxMessages); }
   catch(err) { TL.log('### Erreur favicon (maj) : ' + err); }
-  try { jsli.Transformation(); }
+  try { this.Transformation(); }
   catch(err) { TL.log('### Erreur jsli.Transformation() : ' + err); }
 
   TL.log('Envoi de topiclive:doneprocessing');
@@ -124,6 +124,35 @@ Page.prototype.scan = function()
 
   TL.loop();
 };
+
+// Version perso de JvCare
+Page.prototype.Transformation = function () {
+  $('.JvCare').each(function () {
+    var $span = $(this);
+    var classes = $span.attr('class');
+    var href = TL.jvCake(classes);
+
+    // Suppression de JvCare
+    classes = classes.split(' ');
+    var index = classes.indexOf('JvCare');
+    classes.splice(index, index + 2);
+    classes.unshift('xXx');
+    classes = classes.join(' ');
+
+    $span.replaceWith('<a href="' + href + '" class="' + classes + '">' +
+                      $span.html() + '</a>');
+
+    // Fix temporaire des avatars
+    $span.children().each(function () {
+      var $elem = $(this);
+      var newsrc = $elem.attr('data-srcset');
+      if(newsrc != 'undefined') {
+        $elem.attr('src', newsrc);
+        $elem.removeAttr('data-srcset');
+      }
+    });
+  });
+}
 
 Page.prototype.trouver = function(chose)
 {

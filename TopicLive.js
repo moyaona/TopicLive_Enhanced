@@ -18,7 +18,7 @@ TopicLive.prototype.charger = function()
 {
   // this.log('TL.charger()');
   if(this.oldInstance == this.instance) {
-    $('.bloc-header-form').text('Répondre ○');
+    $('.titre-bloc').text('Répondre ○');
     $.ajax({
       type: 'GET',
       url: this.url,
@@ -26,10 +26,10 @@ TopicLive.prototype.charger = function()
       success: (function(data) {
         if(this.oldInstance == this.instance)
 	{
-          $('.bloc-header-form').text('Répondre ●');
+          $('.titre-bloc').text('Répondre ●');
           new Page($(data.substring(data.indexOf('<!DOCTYPE html>')))).scan();
           setTimeout((function() {
-            $('.bloc-header-form').text('Répondre');
+            $('.titre-bloc').text('Répondre');
           }).bind(this), 100);
         } else {
 	  this.log('Nouvelle instance detectee : arret du chargement');
@@ -53,7 +53,7 @@ TopicLive.prototype.init = function()
   this.instance++;
   this.ajaxTs = $('#ajax_timestamp_liste_messages').val();
   this.ajaxHash = $('#ajax_hash_liste_messages').val();
-  this.estMP = $('#mp-page').length;
+  this.estMP = $('.mp-page').length;
   this.url = this.estMP ? document.URL.substring(0, document.URL.indexOf('&')) : document.URL;
 
   this.ajouterOptions();

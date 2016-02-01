@@ -5,13 +5,14 @@
 // @match http://www.jeuxvideo.com/*
 // @match http://www.forumjv.com/*
 // @run-at document-end
+// @require http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @require Favicon.js
 // @require Formulaire.js
 // @require Message.js
 // @require Option.js
 // @require Page.js
 // @require TopicLive.js
-// @version 5.0.10
+// @version 5.1.0
 // @grant none
 // @noframes
 // ==/UserScript==
