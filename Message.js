@@ -15,8 +15,6 @@ Message.prototype.afficher = function()
 	TL.log('Affichage du message ' + this.id_message);
 	this.$message.hide();
 	this.fixCitation();
-	try { replace_spoilers(this.$message[0]); }
-	catch(err) { TL.log('### Erreur : replace_spoilers'); }
 	$('.bloc-message-forum:last').after(this.$message);
 	this.$message.fadeIn('slow');
 
