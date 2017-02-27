@@ -10,17 +10,17 @@ function Favicon()
 
 Favicon.prototype.clear = function()
 {
-  this.context.clearRect(0, 0, this.canv.width, this.canv.height);
+  this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   this.context.drawImage(this.image, 0, 0);
 };
 
 Favicon.prototype.init = function()
 {
   TL.log('Initialisation du Favicon');
-  this.canv = $('<canvas>').get(0);
-  this.canv.width = 16;
-  this.canv.height = 16;
-  this.context = this.canv.getContext('2d');
+  this.canvas = $('<canvas>').get(0);
+  this.canvas.width = 16;
+  this.canvas.height = 16;
+  this.context = this.canvas.getContext('2d');
   this.image = new Image();
   this.image.src = '/favicon.ico';
 
@@ -49,7 +49,7 @@ Favicon.prototype.replace = function()
 {
   if(typeof this.lien !== 'undefined') this.lien.remove();
   this.lien = $('<link>', {
-    href: this.canv.toDataURL('image/png'),
+    href: this.canvas.toDataURL('image/png'),
     rel: 'shortcut icon',
     type: 'image/png'
   });
