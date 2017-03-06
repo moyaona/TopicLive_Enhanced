@@ -14,6 +14,7 @@ Message.prototype.afficher = function()
 {
 	TL.log('Affichage du message ' + this.id_message);
 	this.$message.hide();
+	this.fixBlacklist();
 	this.fixCitation();
 	$('.bloc-message-forum:last').after(this.$message);
 	this.$message.fadeIn('slow');
@@ -24,6 +25,29 @@ Message.prototype.afficher = function()
 			jvcake: TL.jvCake
 		}
 	}));
+};
+
+Message.prototype.fixBlacklist = function () {
+	this.trouver('.bloc-options-msg > .picto-msg-tronche, .msg-pseudo-blacklist .btn-blacklist-cancel').on('click', function () {
+		$.ajax({
+			url: '/forums/ajax_forum_blacklist.php',
+			data: {
+				id_alias_msg: this.$message.attr('data-id-alias'),
+				action: this.$message.attr('data-action'),
+				ajax_hash: $('#ajax_hash_preference_user')
+			},
+			dataType: 'json',
+			success: function(e) {
+				if(e.erreur && e.erreur.length) {
+					modal('erreur', {
+						message: e.erreur
+					});
+				} else {
+					document.location.reload();
+				}
+			}
+		});
+	});
 };
 
 Message.prototype.fixCitation = function()
