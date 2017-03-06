@@ -131,7 +131,10 @@ Formulaire.prototype.verifMessage = function()
       dataType: 'json',
       timeout: 5000,
       success: this.envoyer.bind(this),
-      error: this.verifMessage.bind(this)
+      error: this.verifMessage.bind(this),
+      complete: function(xhr, status) {
+        TL.log('Statut envoi message : ' + status);
+      }
     });
   }
 
