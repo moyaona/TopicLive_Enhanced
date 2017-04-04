@@ -1,6 +1,6 @@
 function Page($page)
 {
-  TL.log('Nouvelle page.');
+  // TL.log('Nouvelle page.');
   this.$page = $page;
 }
 
@@ -27,6 +27,13 @@ Page.prototype.maj = function()
   try { this.Transformation(); }
   catch(err) { TL.log('### Erreur jsli.Transformation() : ' + err); }
 
+  // Nettoyage des anciens messages
+  var nb_messages = $('.bloc-message-forum:not(.msg-pseudo-blacklist)').size();
+  if(nb_messages > 100) {
+    $('.bloc-message-forum:not(.msg-pseudo-blacklist)')
+        .slice(0, nb_messages - 100).remove();
+  }
+
   TL.log('Envoi de topiclive:doneprocessing');
   dispatchEvent(new CustomEvent('topiclive:doneprocessing', {
     'detail': { jvcake: TL.jvCake }
@@ -35,7 +42,7 @@ Page.prototype.maj = function()
 
 Page.prototype.scan = function()
 {
-  TL.log('Scan de la page');
+  // TL.log('Scan de la page');
   TL.ajaxTs = this.trouver('#ajax_timestamp_liste_messages').val();
   TL.ajaxHash = this.trouver('#ajax_hash_liste_messages').val();
 
@@ -56,7 +63,7 @@ Page.prototype.scan = function()
   var nvMsgs = this.obtenirMessages();
   var anciensMsgs = TL.messages;
 
-  TL.log('Verification des messages supprimes');
+  // TL.log('Verification des messages supprimes');
   try {
   if(!TL.estMP) {
     for(var i in anciensMsgs) {
@@ -74,7 +81,7 @@ Page.prototype.scan = function()
   }
   } catch(err) { TL.log('### Erreur messages supprimes : ' + err); }
 
-  TL.log('Verification des nouveaux messages et editions');
+  // TL.log('Verification des nouveaux messages et editions');
   try {
   for(var k in nvMsgs) {
     if(!nvMsgs.hasOwnProperty(k)) continue; // fix chrome
@@ -102,7 +109,7 @@ Page.prototype.scan = function()
       }
     }
     if(nv) {
-      TL.log('Nouveau message !');
+      // TL.log('Nouveau message !');
       TL.messages.push(nvMsgs[k]);
       TL.nvxMessages++;
       nvMsgs[k].afficher();
@@ -118,7 +125,7 @@ Page.prototype.scan = function()
     this.maj();
     TL.formu.forcerMaj = false;
   } else {
-    TL.log('Aucun nouveau message.');
+    // TL.log('Aucun nouveau message.');
     if(TL.formu.forcerMaj) setTimeout(TL.charger.bind(TL), 1000);
   }
 
