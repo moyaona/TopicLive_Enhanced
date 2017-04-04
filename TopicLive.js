@@ -10,7 +10,8 @@ TopicLive.prototype.ajouterOptions = function()
 {
   // this.log('ajouterOptions()');
   this.options = {
-    optionSon: new TLOption('Son TopicLive', 'topiclive_son')
+    optionSon: new TLOption('Son TopicLive', 'topiclive_son'),
+    optionVitesse: new TLOption('Chargement rapide', 'topiclive_chargement')
   };
 };
 
@@ -108,7 +109,12 @@ TopicLive.prototype.loop = function()
   // this.log('loop()');
   if(typeof this.idanalyse !== 'undefined') window.clearTimeout(this.idanalyse);
 
-  var duree = this.ongletActif ? 5000 : 10000;
+  var duree;
+  if(localStorage.topiclive_chargement == 'true')
+    duree = this.ongletActif ? 500 : 2000;
+  else
+    duree = this.ongletActif ? 5000 : 10000;
+
   this.oldInstance = this.instance;
   this.idanalyse = setTimeout(this.charger.bind(this), duree);
 };
