@@ -9,26 +9,19 @@ function TLOption(nom, id)
 
 TLOption.prototype.injecter = function()
 {
-  TL.log('Ajout de l\'option ' + this.nom);
+  TL.log("Ajout de l'option '" + this.nom + "'");
 
   // Ajout de l'option aux options JVC
-  var option = '<li><span class="pull-left">' + this.nom + '</span>';
-  option += '<span class="interrupteur-inline ';
-  option += (this.actif ? 'actif' : 'pointer') + ' ' + this.id + '" id="';
-  option += this.id + '_ON">OUI</span><span class="interrupteur-inline ';
-  option += (this.actif ? 'pointer' : 'actif');
-  option += ' ' + this.id + '" id="' + this.id + '_OFF">NON</span></li>';
+  var option = '<li><span class="pull-left">TopicLive - ' + this.nom + '</span>';
+  option += '<input type="checkbox" class="input-on-off" id="' + this.id + '" ';
+  option += this.actif ? 'checked>' : '>';
+  option += '<label for="' + this.id + '" class="btn-on-off"></label></li>';
   $('.menu-user-forum').append(option);
 
   // Register des events lors du toggle de l'option
-  $('#' + this.id + '_ON').on('click', (function() {
-    localStorage[this.id] = 'true';
-    $('#' + this.id + '_ON').attr('class', 'interrupteur-inline actif');
-    $('#' + this.id + '_OFF').attr('class', 'interrupteur-inline pointer');
-  }).bind(this));
-  $('#' + this.id + '_OFF').on('click', (function() {
-    localStorage[this.id] = 'false';
-    $('#' + this.id + '_ON').attr('class', 'interrupteur-inline pointer');
-    $('#' + this.id + '_OFF').attr('class', 'interrupteur-inline actif');
+  this.bouton = $('#' + this.id);
+  this.bouton.change((function() {
+    this.actif = !this.actif;
+    localStorage[this.id] = this.actif;
   }).bind(this));
 };

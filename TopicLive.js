@@ -8,16 +8,14 @@ function TopicLive()
 
 TopicLive.prototype.ajouterOptions = function()
 {
-  // this.log('ajouterOptions()');
   this.options = {
-    optionSon: new TLOption('Son TopicLive', 'topiclive_son'),
+    optionSon: new TLOption('Son', 'topiclive_son'),
     optionVitesse: new TLOption('Chargement rapide', 'topiclive_chargement')
   };
 };
 
 TopicLive.prototype.charger = function()
 {
-  // this.log('TL.charger()');
   if(this.oldInstance == this.instance) {
     $('#bloc-formulaire-forum .titre-bloc').text('Répondre ○');
     $.ajax({
@@ -59,9 +57,9 @@ TopicLive.prototype.init = function()
 
   this.ajouterOptions();
 
-  // Si on est sur les forums ou en MP
-  if(document.URL.match(/\/forums\//) || document.URL.match(/\/messages-prives\//)) {
-    this.log('Il y a des messages dans la page.');
+  // Si un message est present dans la page
+  if($('.bloc-message-forum').length) {
+    this.log('TopicLive actif sur cette page.');
     this.page = new Page($(document));
     this.formu = new Formulaire();
     this.messages = this.page.obtenirMessages();
@@ -89,7 +87,6 @@ TopicLive.prototype.initStatic = function()
 // Transforme une classe chiffree par JvCare en un lien
 TopicLive.prototype.jvCake = function(classe)
 {
-  // this.log('jvCake()');
   var base16 = '0A12B34C56D78E9F', lien = '', s = classe.split(' ')[1];
   for (var i = 0; i < s.length; i += 2) {
     lien += String.fromCharCode(base16.indexOf(s.charAt(i)) * 16 + base16.indexOf(s.charAt(i + 1)));
@@ -106,7 +103,6 @@ TopicLive.prototype.log = function(message)
 
 TopicLive.prototype.loop = function()
 {
-  // this.log('loop()');
   if(typeof this.idanalyse !== 'undefined') window.clearTimeout(this.idanalyse);
 
   var duree;
@@ -121,7 +117,6 @@ TopicLive.prototype.loop = function()
 
 TopicLive.prototype.majUrl = function(page)
 {
-  // this.log('majUrl()');
   if(this.estMP) return;
 
   var $bouton = page.trouver('.pagi-fin-actif');
