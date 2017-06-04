@@ -57,8 +57,12 @@ TopicLive.prototype.init = function()
 
   this.ajouterOptions();
 
-  // Si un message est present dans la page
-  if($('.bloc-message-forum').length) {
+  // Actif sur les URL de forums ou de messages privés, tant qu'il y a un
+  // message dans la page.
+  // -> Sera compatible respeed, sans pour autant s'exécuter sur des pages
+  //    non supportées (ex. GTA)
+  if((document.URL.match(/\/forums\//) || document.URL.match(/\/messages-prives\//))
+      && $('.bloc-message-forum').length > 0) {
     this.log('TopicLive actif sur cette page.');
     this.page = new Page($(document));
     this.formu = new Formulaire();
