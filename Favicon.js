@@ -47,7 +47,7 @@ Favicon.prototype.maj = function(txt)
 
 Favicon.prototype.replace = function()
 {
-  if(typeof this.lien !== 'undefined') this.lien.remove();
+  $('link[rel*="icon"]').remove();
   this.lien = $('<link>', {
     href: this.canv.toDataURL('image/png'),
     rel: 'shortcut icon',
