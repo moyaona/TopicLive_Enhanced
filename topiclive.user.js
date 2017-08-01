@@ -4,6 +4,7 @@
 // @author Kiwec
 // @match http://www.jeuxvideo.com/*
 // @match http://www.forumjv.com/*
+// @match http://m.jeuxvideo.com/*
 // @run-at document-end
 // @require http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @require Favicon.js
@@ -12,7 +13,7 @@
 // @require Option.js
 // @require Page.js
 // @require TopicLive.js
-// @version 5.1.9
+// @version 5.2.0
 // @grant none
 // @noframes
 // ==/UserScript==

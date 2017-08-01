@@ -1,9 +1,16 @@
 function Message($message)
 {
-	if(TL.estMP) this.id_message = 'MP';
-	else 				 this.id_message = parseInt($message.attr('data-id'), 10);
+	if(TL.estMP) {
+		this.id_message = 'MP';
+	} else if(TL.mobile) {
+		var id = $message.attr('id');
+		id = id.slice(id.indexOf('_') + 1);
+		this.id_message = parseInt(id, 10);
+	} else {
+		this.id_message = parseInt($message.attr('data-id'), 10);
+	}
 
-	this.date = $('.bloc-date-msg', $message).text().replace(/[\r\n]|#[0-9]+$/g, '');
+	this.date = $(TL.class_date, $message).text().replace(/[\r\n]|#[0-9]+$/g, '');
 	this.edition = $message.find('.info-edition-msg').text();
 	this.$message = $message;
 	this.pseudo = $('.bloc-pseudo-msg', $message).text().replace(/[\r\n]/g, '');
@@ -16,7 +23,7 @@ Message.prototype.afficher = function()
 	this.$message.hide();
 	this.fixBlacklist();
 	this.fixCitation();
-	$('.bloc-message-forum:last').after(this.$message);
+	$(TL.class_msg + ':last').after(this.$message);
 	this.$message.fadeIn('slow');
 
 	dispatchEvent(new CustomEvent('topiclive:newmessage', {
@@ -110,7 +117,7 @@ Message.prototype.update = function(nvMessage)
 	TL.log('Message ' + this.id_message + ' edite : mise a jour');
 
 	this.edition = nvMessage.edition;
-	this.trouver('.bloc-contenu').html(nvMessage.trouver('.bloc-contenu').html());
+	this.trouver(TL.class_contenu).html(nvMessage.trouver(TL.class_contenu).html());
 
 	dispatchEvent(new CustomEvent('topiclive:edition', {
 		'detail': {

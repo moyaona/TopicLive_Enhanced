@@ -8,7 +8,7 @@ Page.prototype.obtenirMessages = function()
 {
   // TL.log('page.obtenirMessages()');
   var msgs = [];
-  this.trouver('.bloc-message-forum:not(.msg-pseudo-blacklist)').each(function() {
+  this.trouver(TL.class_msg + ':not(.msg-pseudo-blacklist)').each(function() {
     msgs.push(new Message($(this)));
   });
   return msgs;
@@ -28,10 +28,11 @@ Page.prototype.maj = function()
   catch(err) { TL.log('### Erreur jsli.Transformation() : ' + err); }
 
   // Nettoyage des anciens messages
-  var nb_messages = $('.bloc-message-forum:not(.msg-pseudo-blacklist)').size();
+  var nb_messages = $(TL.class_msg + ':not(.msg-pseudo-blacklist)').size();
   if(nb_messages > 100) {
-    $('.bloc-message-forum:not(.msg-pseudo-blacklist)')
-        .slice(0, nb_messages - 100).remove();
+    $(TL.class_msg + ':not(.msg-pseudo-blacklist)')
+    .slice(0, nb_messages - 100)
+    .remove();
   }
 
   TL.log('Envoi de topiclive:doneprocessing');
@@ -49,7 +50,7 @@ Page.prototype.scan = function()
   // Maj du nombre de connectes
   $('.nb-connect-fofo').text(this.trouver('.nb-connect-fofo').text());
 
-  if($('.conteneur-message').length === 0 || $('.pagi-fin-actif').length !== 0) {
+  if($(TL.class_msg).length === 0 || $(TL.class_page_fin).length !== 0) {
     TL.log('Pas sur une derniere page : loop');
     TL.majUrl(this);
     TL.loop();
@@ -90,8 +91,8 @@ Page.prototype.scan = function()
       if(!anciensMsgs.hasOwnProperty(l)) continue; // fix chrome
       if(TL.estMP) {
         if(anciensMsgs[l].trouver('.bloc-spoil-jv').length !== 0) {
-	      var ancienneDate = anciensMsgs[l].trouver('.bloc-date-msg').text();
-        var nouvelleDate = nvMsgs[k].trouver('.bloc-date-msg').text();
+	      var ancienneDate = anciensMsgs[l].trouver(TL.class_date).text();
+        var nouvelleDate = nvMsgs[k].trouver(TL.class_date).text();
         if(ancienneDate == nouvelleDate) {
             nv = false;
             break;

@@ -8,6 +8,7 @@ function TopicLive()
 
 TopicLive.prototype.ajouterOptions = function()
 {
+  if(this.mobile) return;
   this.options = {
     optionSon: new TLOption('Son', 'topiclive_son'),
     optionVitesse: new TLOption('Chargement rapide', 'topiclive_chargement')
@@ -17,18 +18,29 @@ TopicLive.prototype.ajouterOptions = function()
 TopicLive.prototype.charger = function()
 {
   if(this.oldInstance == this.instance) {
-    $('#bloc-formulaire-forum .titre-bloc').text('Répondre ○');
+    if(this.mobile) {
+      $('.bloc-nom-sujet:last').text($('.bloc-nom-sujet:first').text() + ' ○');
+    } else {
+      $('#bloc-formulaire-forum .titre-bloc').text('Répondre ○');
+    }
     $.ajax({
       type: 'GET',
       url: this.url,
       timeout: 5000,
       success: (function(data) {
-        if(this.oldInstance == this.instance)
-	{
-          $('#bloc-formulaire-forum .titre-bloc').text('Répondre ●');
+        if(this.oldInstance == this.instance) {
+          if(this.mobile) {
+            $('.bloc-nom-sujet:last').text($('.bloc-nom-sujet:first').text() + ' ●');
+          } else {
+            $('#bloc-formulaire-forum .titre-bloc').text('Répondre ●');
+          }
           new Page($(data.substring(data.indexOf('<!DOCTYPE html>')))).scan();
           setTimeout((function() {
-            $('#bloc-formulaire-forum .titre-bloc').text('Répondre');
+            if(this.mobile) {
+              $('.bloc-nom-sujet:last').text($('.bloc-nom-sujet:first').text());
+            } else {
+              $('#bloc-formulaire-forum .titre-bloc').text('Répondre');
+            }
           }).bind(this), 100);
         } else {
 	  this.log('Nouvelle instance detectee : arret du chargement');
@@ -54,6 +66,13 @@ TopicLive.prototype.init = function()
   this.ajaxHash = $('#ajax_hash_liste_messages').val();
   this.estMP = $('.mp-page').length;
   this.url = this.estMP ? document.URL.substring(0, document.URL.indexOf('&')) : document.URL;
+  this.mobile = document.URL.indexOf('//m.jeuxvideo.com') != -1;
+
+  this.class_msg = this.mobile ? '.post' : '.bloc-message-forum';
+  this.class_num_page = this.mobile ? '.num-page' : '.page-active';
+  this.class_page_fin = this.mobile ? '.right-elt > a' : '.pagi-fin-actif';
+  this.class_date = this.mobile ? '.date-post' : '.bloc-date-msg';
+  this.class_contenu = this.mobile ? '.contenu' : '.bloc-contenu';
 
   this.ajouterOptions();
 
@@ -62,7 +81,7 @@ TopicLive.prototype.init = function()
   // -> Sera compatible respeed, sans pour autant s'exécuter sur des pages
   //    non supportées (ex. GTA)
   if((document.URL.match(/\/forums\//) || document.URL.match(/\/messages-prives\//))
-      && $('.bloc-message-forum').length > 0) {
+      && $(this.class_msg).length > 0) {
     this.log('TopicLive actif sur cette page.');
     this.page = new Page($(document));
     this.formu = new Formulaire();
@@ -115,6 +134,9 @@ TopicLive.prototype.loop = function()
   else
     duree = this.ongletActif ? 5000 : 10000;
 
+  if(this.mobile)
+    duree = 10000;
+
   this.oldInstance = this.instance;
   this.idanalyse = setTimeout(this.charger.bind(this), duree);
 };
@@ -123,8 +145,8 @@ TopicLive.prototype.majUrl = function(page)
 {
   if(this.estMP) return;
 
-  var $bouton = page.trouver('.pagi-fin-actif');
-  var numPage = page.trouver('.page-active:first').text();
+  var $bouton = page.trouver(this.class_page_fin);
+  var numPage = page.trouver(this.class_num_page + ':first').text();
   var testUrl = this.url.split('-');
 
   // Si le bouton page suivante est present
