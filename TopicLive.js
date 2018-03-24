@@ -67,6 +67,11 @@ TopicLive.prototype.init = function()
   this.class_contenu = this.mobile ? '.contenu' : '.bloc-contenu';
 
   this.ajouterOptions();
+  
+  if(document.URL.match(/\/messages-prives\//)) {
+    this.log('Support des MPs temporairement désactivé.');
+    return;
+  }
 
   // Actif sur les URL de forums ou de messages privés, tant qu'il y a un
   // message dans la page.
