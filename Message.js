@@ -23,6 +23,9 @@ Message.prototype.afficher = function()
 	this.$message.hide();
 	this.fixBlacklist();
 	this.fixCitation();
+  if(TL.mobile) {
+    this.fixMobile();
+  }
 	$(TL.class_msg + ':last').after(this.$message);
 	this.$message.fadeIn('slow');
 
@@ -85,6 +88,11 @@ Message.prototype.fixCitation = function()
 			error: this.fixCitation.bind(this)
 		});
 	}).bind(this));
+};
+
+Message.prototype.fixMobile = function()
+{
+  this.trouver('.message').addClass('show-all');
 };
 
 Message.prototype.trouver = function(chose)
