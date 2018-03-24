@@ -23,6 +23,7 @@ Message.prototype.afficher = function()
 	this.$message.hide();
 	this.fixBlacklist();
 	this.fixCitation();
+  this.fixDeroulerCitation();
   if(TL.mobile) {
     this.fixMobile();
   }
@@ -88,6 +89,13 @@ Message.prototype.fixCitation = function()
 			error: this.fixCitation.bind(this)
 		});
 	}).bind(this));
+};
+
+Message.prototype.fixDeroulerCitation = function()
+{
+  this.trouver('blockquote').click(function() {
+    $(this).attr('data-visible', '1');
+  });
 };
 
 Message.prototype.fixMobile = function()
