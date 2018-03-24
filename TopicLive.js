@@ -12,8 +12,7 @@ TopicLive.prototype.ajouterOptions = function()
 {
   if(this.mobile) return;
   this.options = {
-    optionSon: new TLOption('Son', 'topiclive_son'),
-    optionVitesse: new TLOption('Chargement rapide', 'topiclive_chargement')
+    optionSon: new TLOption('Son', 'topiclive_son')
   };
 };
 
@@ -131,11 +130,7 @@ TopicLive.prototype.loop = function()
 {
   if(typeof this.idanalyse !== 'undefined') window.clearTimeout(this.idanalyse);
 
-  var duree;
-  if(localStorage.topiclive_chargement == 'true')
-    duree = this.ongletActif ? 500 : 2000;
-  else
-    duree = this.ongletActif ? 5000 : 10000;
+  var duree = this.ongletActif ? 5000 : 10000;
 
   if(this.mobile)
     duree = 10000;
