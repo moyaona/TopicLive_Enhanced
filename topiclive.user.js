@@ -3,7 +3,6 @@
 // @description Charge les nouveaux messages d'un topic de JVC en direct
 // @author Kiwec
 // @match http://www.jeuxvideo.com/*
-// @match http://www.forumjv.com/*
 // @match http://m.jeuxvideo.com/*
 // @run-at document-end
 // @require http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
