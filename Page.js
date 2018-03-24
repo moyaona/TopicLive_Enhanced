@@ -160,7 +160,7 @@ Page.prototype.Transformation = function () {
       $elem.removeAttr('data-srcset');
     }
   });
-}
+};
 
 Page.prototype.trouver = function(chose)
 {

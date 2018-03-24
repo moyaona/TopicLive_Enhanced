@@ -1,3 +1,5 @@
+/* jshint multistr: true */
+
 function TopicLive()
 {
   this.log('Initialisation.');
@@ -70,8 +72,8 @@ TopicLive.prototype.init = function()
   // message dans la page.
   // -> Sera compatible respeed, sans pour autant s'exécuter sur des pages
   //    non supportées (ex. GTA)
-  if((document.URL.match(/\/forums\//) || document.URL.match(/\/messages-prives\//))
-      && $(this.class_msg).length > 0) {
+  var analysable = (document.URL.match(/\/forums\//) || document.URL.match(/\/messages-prives\//));
+  if(analysable && $(this.class_msg).length > 0) {
     this.log('TopicLive actif sur cette page.');
     this.page = new Page($(document));
     this.formu = new Formulaire();
