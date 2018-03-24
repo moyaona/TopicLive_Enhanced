@@ -17,40 +17,30 @@ TopicLive.prototype.ajouterOptions = function()
 
 TopicLive.prototype.charger = function()
 {
-  if(this.oldInstance == this.instance) {
-    if(this.mobile) {
-      $('.bloc-nom-sujet:last').text($('.bloc-nom-sujet:first').text() + ' ○');
-    } else {
-      $('#bloc-formulaire-forum .titre-bloc').text('Répondre ○');
-    }
-    $.ajax({
-      type: 'GET',
-      url: this.url,
-      timeout: 5000,
-      success: (function(data) {
-        if(this.oldInstance == this.instance) {
-          if(this.mobile) {
-            $('.bloc-nom-sujet:last').text($('.bloc-nom-sujet:first').text() + ' ●');
-          } else {
-            $('#bloc-formulaire-forum .titre-bloc').text('Répondre ●');
-          }
-          new Page($(data.substring(data.indexOf('<!DOCTYPE html>')))).scan();
-          setTimeout((function() {
-            if(this.mobile) {
-              $('.bloc-nom-sujet:last').text($('.bloc-nom-sujet:first').text());
-            } else {
-              $('#bloc-formulaire-forum .titre-bloc').text('Répondre');
-            }
-          }).bind(this), 100);
-        } else {
-	  this.log('Nouvelle instance detectee : arret du chargement');
-	}
-      }).bind(this),
-      error: this.loop.bind(this)
-    });
-  } else {
+  if(this.oldInstance != this.instance) {
     this.log('Nouvelle instance detectee : arret du chargement');
+    return;
   }
+
+  var blocChargement = this.mobile ? $('.bloc-nom-sujet:last > span') : $('#bloc-formulaire-forum .titre-bloc');
+  blocChargement.addClass('topiclive-loading');
+  $.ajax({
+    type: 'GET',
+    url: this.url,
+    timeout: 5000,
+    success: (function(data) {
+      if(this.oldInstance != this.instance) {
+        this.log('Nouvelle instance detectee : arret du chargement');
+        return;
+      }
+
+      blocChargement.removeClass('topiclive-loading');
+      blocChargement.addClass('topiclive-loaded');
+      new Page($(data.substring(data.indexOf('<!DOCTYPE html>')))).scan();
+      setTimeout(function() { blocChargement.removeClass('topiclive-loaded'); }, 100);
+    }).bind(this),
+    error: this.loop.bind(this)
+  });
 };
 
 // Sera initialise a chaque changement de page
@@ -104,6 +94,12 @@ TopicLive.prototype.initStatic = function()
   this.suivreOnglets();
   this.init();
   addEventListener('instantclick:newpage', this.init.bind(this));
+
+  $("head").append("<style type='text/css'>\
+      .topiclive-loading:after { content: ' ○' }\
+      .topiclive-loaded:after { content: ' ●' }\
+    </style>");
+  
   this.log('Fin de l\'initialisation de TopicLive');
 };
 
