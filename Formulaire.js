@@ -109,7 +109,7 @@ Formulaire.prototype.obtenirMessage = function($form)
 Formulaire.prototype.obtenirFormulaire = function($page)
 {
   if(typeof $page === 'undefined') $page = $(document);
-  return $page.find(TL.estMP ? '.form-post-topic' : '.form-post-message');
+  return $page.find(TL.estMP ? '.form-post-topic:last' : '.form-post-message');
 };
 
 Formulaire.prototype.verifMessage = function()
