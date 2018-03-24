@@ -22,26 +22,10 @@ TopicLive.prototype.charger = function()
     this.log('Nouvelle instance detectee : arret du chargement');
     return;
   }
-
-  var blocChargement = this.mobile ? $('.bloc-nom-sujet:last > span') : $('#bloc-formulaire-forum .titre-bloc');
-  blocChargement.addClass('topiclive-loading');
-  $.ajax({
-    type: 'GET',
-    url: this.url,
-    timeout: 5000,
-    success: (function(data) {
-      if(this.oldInstance != this.instance) {
-        this.log('Nouvelle instance detectee : arret du chargement');
-        return;
-      }
-
-      blocChargement.removeClass('topiclive-loading');
-      blocChargement.addClass('topiclive-loaded');
-      new Page($(data.substring(data.indexOf('<!DOCTYPE html>')))).scan();
-      setTimeout(function() { blocChargement.removeClass('topiclive-loaded'); }, 100);
-    }).bind(this),
-    error: this.loop.bind(this)
-  });
+  
+  TL.GET(function(data) {
+    new Page(data);
+  }, this.loop.bind(this));
 };
 
 // Sera initialise a chaque changement de page
@@ -66,11 +50,6 @@ TopicLive.prototype.init = function()
   this.class_contenu = this.mobile ? '.contenu' : '.bloc-contenu';
 
   this.ajouterOptions();
-  
-  if(document.URL.match(/\/messages-prives\//)) {
-    this.log('Support des MPs temporairement désactivé.');
-    return;
-  }
 
   // Actif sur les URL de forums ou de messages privés, tant qu'il y a un
   // message dans la page.
@@ -117,6 +96,17 @@ TopicLive.prototype.jvCake = function(classe)
     lien += String.fromCharCode(base16.indexOf(s.charAt(i)) * 16 + base16.indexOf(s.charAt(i + 1)));
   }
   return lien;
+};
+
+TopicLive.prototype.alert = function(message)
+{
+  try {
+    modal('erreur', { message: message });
+    this.log(message);
+  } catch(err) {
+    this.log('### Fonction modal() inaccessible');
+    alert(message);
+  }
 };
 
 TopicLive.prototype.log = function(message)
@@ -183,4 +173,27 @@ TopicLive.prototype.suivreOnglets = function()
       this.nvxMessages = 0;
     }
   }).bind(this));
+};
+
+TopicLive.prototype.GET = function(cb, err)
+{
+  var blocChargement = this.mobile ? $('.bloc-nom-sujet:last > span') : $('#bloc-formulaire-forum .titre-bloc');
+  blocChargement.addClass('topiclive-loading');
+  $.ajax({
+    type: 'GET',
+    url: this.url,
+    timeout: 5000,
+    success: (function(data) {
+      if(this.oldInstance != this.instance) {
+        this.log('Nouvelle instance detectee : arret du chargement');
+        return;
+      }
+  
+      blocChargement.removeClass('topiclive-loading');
+      blocChargement.addClass('topiclive-loaded');
+      cb($(data.substring(data.indexOf('<!DOCTYPE html>'))));
+      setTimeout(function() { blocChargement.removeClass('topiclive-loaded'); }, 100);
+    }).bind(this),
+    error: err.bind(this)
+  });
 };

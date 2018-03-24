@@ -50,9 +50,7 @@ Message.prototype.fixBlacklist = function () {
 			dataType: 'json',
 			success: function(e) {
 				if(e.erreur && e.erreur.length) {
-					modal('erreur', {
-						message: e.erreur
-					});
+          TL.alert(e.erreur);
 				} else {
 					document.location.reload();
 				}

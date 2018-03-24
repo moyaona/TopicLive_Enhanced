@@ -14,10 +14,7 @@ Formulaire.prototype.envoyer = function(e)
       message_erreur += e.erreurs[i];
       if(i < e.erreurs.length) message_erreur += '<br />';
     }
-    try {
-      modal('erreur', { message: message_erreur });
-      TL.log('Envoi annule car message invalide : ' + message_erreur);
-    } catch(err) { TL.log('### Erreur modal() (formulaire) : ' + err); }
+    TL.alert(message_erreur);
   } else {
     TL.log('Message valide. Envoi en cours');
     this.trouver('.btn-poster-msg').attr('disabled', 'disabled');
@@ -30,21 +27,49 @@ Formulaire.prototype.envoyer = function(e)
       data: this.obtenirFormulaire().serializeArray(),
       timeout: 5000,
       success: (function(data) {
-        var nvPage = new Page($(data.substring(data.indexOf('<!DOCTYPE html>'))));
-        this.forcerMaj = true;
-
-        var $formu = this.obtenirFormulaire(nvPage.$page);
-        if($formu.find('.alert-danger').length !== 0) {
-          this.maj($formu);
-          this.forcerMaj = false;
+        if(typeof data === 'undefined') {
+          TL.alert('Erreur inconnue lors de l\'envoi du message.');
+          return;
         }
-
-        TL.majUrl(nvPage);
-        nvPage.scan();
+        
+        function afterLoad(data) {
+          var nvPage = new Page(data);
+          this.forcerMaj = true;
+          var $formu = this.obtenirFormulaire(nvPage.$page);
+            if($formu.find('.alert-danger').length !== 0) {
+              this.maj($formu);
+              this.forcerMaj = false;
+            }
+          TL.majUrl(nvPage);
+          nvPage.scan();
+        }
+        
+        function recover() {
+          this.trouver('.btn-poster-msg').removeAttr('disabled');
+          this.trouver('.conteneur-editor').fadeIn();
+          TL.loop();
+        }
+        
+        if(typeof data.errors !== 'undefined') {
+          TL.alert(data.errors[0]);
+          recover.call(this);
+          return;
+        } else if(typeof data.redirect_uri === 'undefined') {
+          if(typeof data.indexOf === 'undefined') {
+            TL.alert('Erreur inconnue lors de l\'envoi du message.');
+            console.log(data);
+            recover.call(this);
+            return;
+          }
+          afterLoad.call(this, $(data.substring(data.indexOf('<!DOCTYPE html>'))));
+        } else {
+          TL.url = data.redirect_uri;
+          TL.GET(afterLoad.bind(this), TL.loop.bind(this));
+          return;
+        }
       }).bind(this),
       error: function() {
-        try { modal('message', { message: 'Erreur lors de l\'envoi du message.' }); }
-        catch(err) { TL.log('### Erreur envoi du message : ' + err); }
+        TL.alert('Erreur lors de l\'envoi du message : ' + err);
       }
     });
   }
@@ -109,7 +134,7 @@ Formulaire.prototype.obtenirMessage = function($form)
 Formulaire.prototype.obtenirFormulaire = function($page)
 {
   if(typeof $page === 'undefined') $page = $(document);
-  return $page.find(TL.estMP ? '.form-post-topic:last' : '.form-post-message');
+  return $page.find(TL.estMP ? '#repondre-mp > form' : '.form-post-message');
 };
 
 Formulaire.prototype.verifMessage = function()
