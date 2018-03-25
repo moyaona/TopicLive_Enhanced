@@ -16,7 +16,6 @@ Favicon.prototype.clear = function()
 
 Favicon.prototype.init = function()
 {
-  TL.log('Initialisation du Favicon');
   this.canv = $('<canvas>').get(0);
   this.canv.width = 16;
   this.canv.height = 16;

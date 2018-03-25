@@ -9,8 +9,6 @@ function TLOption(nom, id)
 
 TLOption.prototype.injecter = function()
 {
-  TL.log("Ajout de l'option '" + this.nom + "'");
-
   // Ajout de l'option aux options JVC
   var option = '<li><span class="pull-left">TopicLive - ' + this.nom + '</span>';
   option += '<input type="checkbox" class="input-on-off" id="' + this.id + '" ';

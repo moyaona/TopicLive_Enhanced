@@ -124,10 +124,9 @@ Page.prototype.scan = function()
 
   if(maj) {
     this.maj();
-    TL.formu.forcerMaj = false;
   } else {
     // TL.log('Aucun nouveau message.');
-    if(TL.formu.forcerMaj) setTimeout(TL.charger.bind(TL), 1000);
+    setTimeout(TL.charger.bind(TL), 1000);
   }
 
   TL.loop();

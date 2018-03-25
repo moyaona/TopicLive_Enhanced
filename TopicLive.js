@@ -2,8 +2,7 @@
 
 function TopicLive()
 {
-  this.log('Initialisation.');
-  this.debug = true;
+  this.log('Initialisation');
   this.instance = 0;
   this.ongletActif = true;
 }
@@ -25,13 +24,12 @@ TopicLive.prototype.charger = function()
   
   TL.GET(function(data) {
     new Page(data);
-  }, this.loop.bind(this));
+  });
 };
 
 // Sera initialise a chaque changement de page
 TopicLive.prototype.init = function()
 {
-  this.log('Reinitialisation');
   if(typeof $ === 'undefined') {
     return this.log('### jQuery introuvable !');
   }
@@ -72,7 +70,6 @@ TopicLive.prototype.init = function()
 // Ne sera pas initialise a chaque changement de page
 TopicLive.prototype.initStatic = function()
 {
-  this.log('Premiere initialisation');
   this.favicon = new Favicon();
   this.son = new Audio('https://raw.githubusercontent.com/Kiwec/TopicLive/master/notification.ogg');
 
@@ -85,7 +82,7 @@ TopicLive.prototype.initStatic = function()
       .topiclive-loaded:after { content: ' ●' }\
     </style>");
   
-  this.log('Fin de l\'initialisation de TopicLive');
+  this.log('Fin de l\'initialisation');
 };
 
 // Transforme une classe chiffree par JvCare en un lien
@@ -111,9 +108,7 @@ TopicLive.prototype.alert = function(message)
 
 TopicLive.prototype.log = function(message)
 {
-  if(this.debug) {
-    console.log('[TopicLive] ' + message);
-  }
+  console.log('[TopicLive] ' + message);
 };
 
 TopicLive.prototype.loop = function()
@@ -157,8 +152,6 @@ TopicLive.prototype.majUrl = function(page)
 
 TopicLive.prototype.suivreOnglets = function()
 {
-  this.log('Suivi des onglets active');
-
   $(window).bind('focus', (function() {
     if(!this.ongletActif) {
       this.ongletActif = true;
@@ -179,6 +172,8 @@ TopicLive.prototype.GET = function(cb, err)
 {
   var blocChargement = this.mobile ? $('.bloc-nom-sujet:last > span') : $('#bloc-formulaire-forum .titre-bloc');
   blocChargement.addClass('topiclive-loading');
+  
+  window.clearTimeout(this.idanalyse);
   $.ajax({
     type: 'GET',
     url: this.url,
@@ -193,7 +188,11 @@ TopicLive.prototype.GET = function(cb, err)
       blocChargement.addClass('topiclive-loaded');
       cb($(data.substring(data.indexOf('<!DOCTYPE html>'))));
       setTimeout(function() { blocChargement.removeClass('topiclive-loaded'); }, 100);
+      
+      TL.loop();
     }).bind(this),
-    error: err.bind(this)
+    error: function() {
+      TL.loop();
+    }
   });
 };
