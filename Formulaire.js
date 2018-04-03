@@ -1,6 +1,7 @@
 function Formulaire()
 {
   // TL.log('Nouveau formulaire.');
+  this.hook();
 }
 
 Formulaire.prototype.afficherErreurs = function(msg)
@@ -74,14 +75,23 @@ Formulaire.prototype.envoyer = function(e)
   }
 };
 
+Formulaire.prototype.hook = function()
+{
+  // Remplacement du bouton de post
+  var $form = this.obtenirFormulaire();
+  var $bouton = $form.find('.btn-poster-msg');
+  $bouton.off();
+  $bouton.removeAttr('data-push');
+  $bouton.attr('type', 'button');
+  $bouton.on('click', this.verifMessage.bind(this));
+};
+
 Formulaire.prototype.maj = function($nvform)
 {
-  // TL.log('Mise a jour du formulaire');
+  TL.log('Mise a jour du formulaire');
   var $form = this.obtenirFormulaire();
   var $cap = this.obtenirCaptcha($form);
   var $ncap = this.obtenirCaptcha($nvform);
-
-  TL.log('Mise à jour du formulaire');
 
   // Remplacement hashs formulaire
   this.trouver('input[type="hidden"]').remove();
@@ -104,12 +114,7 @@ Formulaire.prototype.maj = function($nvform)
   // Remplacement du message (JVC n'effacera pas le message en erreur)
   this.obtenirMessage().val(this.obtenirMessage($nvform).val());
 
-  // Remplacement du bouton de post
-  $bouton = $form.find('.btn-poster-msg');
-  $bouton.off();
-  $bouton.removeAttr('data-push');
-  $bouton.attr('type', 'button');
-  $bouton.on('click', this.verifMessage.bind(this));
+  this.hook();
 };
 
 Formulaire.prototype.obtenirCaptcha = function($form)

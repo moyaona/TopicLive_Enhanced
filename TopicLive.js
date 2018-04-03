@@ -23,7 +23,7 @@ TopicLive.prototype.charger = function()
   }
   
   TL.GET(function(data) {
-    new Page(data);
+    new Page(data).scan();
   });
 };
 

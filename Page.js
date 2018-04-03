@@ -57,7 +57,6 @@ Page.prototype.scan = function()
     return;
   }
 
-  TL.formu.maj(TL.formu.obtenirFormulaire(this.$page).clone());
   var maj = false;
 
   // Liste de messages
@@ -124,9 +123,6 @@ Page.prototype.scan = function()
 
   if(maj) {
     this.maj();
-  } else {
-    // TL.log('Aucun nouveau message.');
-    setTimeout(TL.charger.bind(TL), 1000);
   }
 
   TL.loop();
