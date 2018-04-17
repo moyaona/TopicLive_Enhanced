@@ -19,7 +19,7 @@ Formulaire.prototype.afficherErreurs = function(msg)
 Formulaire.prototype.envoyer = function(e)
 {
   // Si le message est invalide selon JVC
-  if(typeof e !== 'undefined' && e.erreurs.length) {
+  if(typeof e !== 'undefined' && typeof e.errors !== 'undefined' && e.errors.length) {
     this.afficherErreurs(e.erreurs);
   } else {
     TL.log('Message valide. Envoi en cours');
@@ -139,9 +139,7 @@ Formulaire.prototype.verifEnvoi = function(data)
 {
   var nvPage = new Page(data);
   var $formu = this.obtenirFormulaire(nvPage.$page);
-  if($formu.find('.alert-danger').length !== 0) {
-    this.maj($formu);
-  }
+  this.maj($formu);
   TL.majUrl(nvPage);
   nvPage.scan();
 };
@@ -165,10 +163,7 @@ Formulaire.prototype.verifMessage = function()
       dataType: 'json',
       timeout: 5000,
       success: this.envoyer.bind(this),
-      error: this.verifMessage.bind(this),
-      complete: function(xhr, status) {
-        TL.log('Statut envoi message : ' + status);
-      }
+      error: this.verifMessage.bind(this)
     });
   }
 
