@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name TopicLive
 // @description Charge les nouveaux messages d'un topic de JVC en direct
-// @author Kiwec
+// @author kiwec
 // @match http://www.jeuxvideo.com/*
 // @match http://m.jeuxvideo.com/*
 // @run-at document-end
@@ -17,5 +17,7 @@
 // @noframes
 // ==/UserScript==
 
+/* globals TopicLive */
+/* exported TL */
 var TL = new TopicLive();
 TL.initStatic();

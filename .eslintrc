@@ -1,7 +1,22 @@
 {
-  "env": {
-    "browser": true,
-    "jquery": true,
-    "greasemonkey": true
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 8,
+        "sourceType": "script",
+        "ecmaFeatures": {
+            "jsx": false,
+            "experimentalObjectRestSpread": false
+        }
+    },
+    "env": {
+        "browser": true,
+        "jquery": true,
+        "greasemonkey": true
+    },
+    "rules": {
+        "indent": [
+            "error",
+            "tab"
+        ]
     }
 }

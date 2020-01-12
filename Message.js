@@ -1,3 +1,6 @@
+/* exports Message */
+/* globals TL */
+
 function Message($message)
 {
 	if(TL.estMP) {
@@ -23,10 +26,10 @@ Message.prototype.afficher = function()
 	this.$message.hide();
 	this.fixBlacklist();
 	this.fixCitation();
-  this.fixDeroulerCitation();
-  if(TL.mobile) {
-    this.fixMobile();
-  }
+	this.fixDeroulerCitation();
+	if(TL.mobile) {
+		this.fixMobile();
+	}
 	$(TL.class_msg + ':last').after(this.$message);
 	this.$message.fadeIn('slow');
 
@@ -50,7 +53,7 @@ Message.prototype.fixBlacklist = function () {
 			dataType: 'json',
 			success: function(e) {
 				if(e.erreur && e.erreur.length) {
-          TL.alert(e.erreur);
+					TL.alert(e.erreur);
 				} else {
 					document.location.reload();
 				}
@@ -91,14 +94,14 @@ Message.prototype.fixCitation = function()
 
 Message.prototype.fixDeroulerCitation = function()
 {
-  this.trouver('blockquote').click(function() {
-    $(this).attr('data-visible', '1');
-  });
+	this.trouver('blockquote').click(function() {
+		$(this).attr('data-visible', '1');
+	});
 };
 
 Message.prototype.fixMobile = function()
 {
-  this.trouver('.message').addClass('show-all');
+	this.trouver('.message').addClass('show-all');
 };
 
 Message.prototype.trouver = function(chose)
