@@ -65,7 +65,7 @@ Page.prototype.scan = function()
 	// Liste de messages
 	var nvMsgs = this.obtenirMessages();
 
-	TL.log('Verification des messages supprimes');
+	// TL.log('Verification des messages supprimes');
 	try {
 		if(!TL.estMP) {
 			for(let msg of TL.messages) {
@@ -78,7 +78,7 @@ Page.prototype.scan = function()
 		}
 	} catch(err) { TL.log('### Erreur messages supprimes : ' + err); }
 
-	TL.log('Verification des nouveaux messages et editions');
+	// TL.log('Verification des nouveaux messages et editions');
 	try {
 		for(let nvMsg of nvMsgs) {
 			var nv = true;

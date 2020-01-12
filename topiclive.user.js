@@ -17,7 +17,5 @@
 // @noframes
 // ==/UserScript==
 
-/* globals TopicLive */
-/* exported TL */
-var TL = new TopicLive();
-TL.initStatic();
+// Vous voulez lire le code source ?
+// C'est ici -> https://github.com/kiwec/TopicLive/
