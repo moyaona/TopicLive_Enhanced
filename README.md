@@ -7,15 +7,10 @@ Une alerte sonore sera lue et une icone s'affichera dans l'onglet en question po
 
 ## Installation
 
-##### Firefox
+- Installez ViolentMonkey ([Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag) - [Firefox](https://addons.mozilla.org/firefox/addon/violentmonkey))
+Les autres gestionnaires d'userscripts sont compatibles.
 
-- Installez [GreaseMonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)
-- Installez [TopicLive](https://github.com/Kiwec/TopicLive/raw/master/topiclive.user.js)
-
-##### Google Chrome
-
-- Installez [TamperMonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-- Installez [TopicLive](https://github.com/Kiwec/TopicLive/raw/master/topiclive.user.js)
+- Installez TopicLive en [cliquant ici](https://github.com/Kiwec/TopicLive/raw/master/topiclive.user.js)
 
 ## Développement
 
