@@ -62,23 +62,8 @@ Page.prototype.scan = function()
 
 	var maj = false;
 
-	// Liste de messages
-	var nvMsgs = this.obtenirMessages();
-
-	// TL.log('Verification des messages supprimes');
-	try {
-		if(!TL.estMP) {
-			for(let msg of TL.messages) {
-				// Si le message n'est plus present dans la liste de nouveaux messages, on traite sa suppression
-				let msg_supprime = nvMsgs.every(nvMsg => msg.id_message == nvMsg.id_message);
-				if(msg_supprime) {
-					msg.supprimer();
-				}
-			}
-		}
-	} catch(err) { TL.log('### Erreur messages supprimes : ' + err); }
-
 	// TL.log('Verification des nouveaux messages et editions');
+	var nvMsgs = this.obtenirMessages();
 	try {
 		for(let nvMsg of nvMsgs) {
 			var nv = true;

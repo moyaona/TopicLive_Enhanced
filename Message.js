@@ -109,25 +109,6 @@ Message.prototype.trouver = function(chose)
 	return this.$message.find(chose);
 };
 
-// Change le CSS du message pour indiquer qu'il est supprime
-Message.prototype.supprimer = function()
-{
-	TL.log('Alerte suppression du message ' + this.id_message);
-	if(!this.supprime) {
-		this.trouver('.bloc-options-msg').hide();
-
-		// Clignotement du messages
-		this.$message.animate({
-			backgroundColor: '#3399FF'
-		}, 50);
-		this.$message.animate({
-			backgroundColor: '#D1F0FF'
-		}, 500);
-
-		this.supprime = true;
-	}
-};
-
 Message.prototype.update = function(nvMessage)
 {
 	if(this.edition == nvMessage.edition) return;
