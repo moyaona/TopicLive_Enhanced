@@ -51,9 +51,9 @@ class TopicLive {
 		// message dans la page.
 		// -> Sera compatible respeed, sans pour autant s'exécuter sur des pages
 		//    non supportées (ex. GTA)
-		var analysable = (document.URL.match(/\/forums\//) || document.URL.match(/\/messages-prives\//));
+		var analysable = (document.URL.match(/\/forums\/\d/) || document.URL.match(/\/messages-prives\//));
 		if(analysable && $(this.class_msg).length > 0) {
-			this.log('TopicLive actif sur cette page. xDDDDDDDDDDD');
+			this.log('TopicLive actif sur cette page.');
 			this.page = new Page($(document));
 			this.formu = new Formulaire();
 			this.messages = this.page.obtenirMessages();
