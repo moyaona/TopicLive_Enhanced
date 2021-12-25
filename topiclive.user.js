@@ -8,7 +8,7 @@
 // @match https://m.jeuxvideo.com/*
 // @run-at document-end
 // @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version 5.3.0
+// @version 5.4.0
 // @grant none
 // @noframes
 // ==/UserScript==
@@ -69,12 +69,18 @@ class Page {
 			return;
 		}
 
-		let maj = false;
+		let messages_a_afficher = [];
 
 		// TL.log('Verification des nouveaux messages et editions');
 		const nvMsgs = this.obtenirMessages();
 		try {
 			for(let nvMsg of nvMsgs) {
+				// TODO: On n'a pas besoin de ce hack. On sait que les IDs
+				// s'incrémentent, il faut juste tenir compte de 8 liste
+				// d'IDs différents, car il y a 8 listes séparées d'IDs qui
+				// s'incrémentent (logique de sharing de JVC). On peut donc
+				// en théorie retirer le check de contenu des messages et
+				// avoir des résultats plus stables.
 				let nv = true;
 				for(let ancienMsg of TL.messages) {
 					if(TL.estMP) {
@@ -101,17 +107,52 @@ class Page {
 					// TL.log('Nouveau message !');
 					TL.messages.push(nvMsg);
 					TL.nvxMessages++;
-					nvMsg.afficher();
-					maj = true;
+
+					nvMsg.$message.hide();
+					nvMsg.fixBlacklist();
+					nvMsg.fixCitation();
+					nvMsg.fixDeroulerCitation();
+					if(TL.mobile) {
+						nvMsg.fixMobile();
+					}
+					$(`${TL.class_msg}:last`).after(nvMsg.$message);
+
+					const evt = {
+						message: nvMsg,
+						cancelled: false
+					};
+					messages_a_afficher.push(evt);
+
+					dispatchEvent(new CustomEvent('topiclive:newmessage', {
+						'detail': {
+							id: nvMsg.id_message,
+							jvcake: TL.jvCake,
+							cancel: () => { evt.cancelled = true; }
+						}
+					}));
 				}
 			}
 		} catch(err) { TL.log(`Erreur nouveaux messages : ${err}`); }
 
-		// Doit etre avant TL.charger()
 		TL.majUrl(this);
 
-		if(maj) {
-			this.maj();
+		if(messages_a_afficher.length > 0) {
+			setTimeout(() => {
+				let maj = false;
+				for(let msg of messages_a_afficher) {
+					if(msg.cancelled) {
+						TL.nvxMessages--;
+					} else {
+						TL.log(`Affichage du message ${msg.message.id_message}`);
+						msg.message.$message.fadeIn('slow');
+						maj = true;
+					}
+				}
+
+				if(maj) {
+					this.maj();
+				}
+			}, 1000);
 		}
 
 		TL.loop();
@@ -194,26 +235,6 @@ class Message {
 		this.$message = $message;
 		this.pseudo = $('.bloc-pseudo-msg', $message).text().replace(/[\r\n]/g, '');
 		this.supprime = false;
-	}
-
-	afficher() {
-		TL.log(`Affichage du message ${this.id_message}`);
-		this.$message.hide();
-		this.fixBlacklist();
-		this.fixCitation();
-		this.fixDeroulerCitation();
-		if(TL.mobile) {
-			this.fixMobile();
-		}
-		$(`${TL.class_msg}:last`).after(this.$message);
-		this.$message.fadeIn('slow');
-
-		dispatchEvent(new CustomEvent('topiclive:newmessage', {
-			'detail': {
-				id: this.id_message,
-				jvcake: TL.jvCake
-			}
-		}));
 	}
 
 	fixBlacklist() {

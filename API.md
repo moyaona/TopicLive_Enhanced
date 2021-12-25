@@ -19,6 +19,17 @@ addEventListener('topiclive:newmessage', function(event){
 });
 ```
 
+## Annuler l'affichage du message
+
+```javascript
+addEventListener('topiclive:newmessage', function(event){
+	if(blablabla) {
+		// Appeler cette méthode moins d'une seconde après l'event annulera l'affichage du message
+		event.detail.cancel();
+	}
+});
+```
+
 ## Contourner JvCare
 
 Pour récupérer les liens dans un message, il vous faudra contourner JvCare. Chaque lien est un `span`.
