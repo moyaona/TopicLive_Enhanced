@@ -8,7 +8,7 @@
 // @match https://m.jeuxvideo.com/*
 // @run-at document-end
 // @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version 5.4.0
+// @version 5.4.1
 // @grant none
 // @noframes
 // ==/UserScript==
@@ -115,7 +115,7 @@ class Page {
 					if(TL.mobile) {
 						nvMsg.fixMobile();
 					}
-					$(`${TL.class_msg}:last`).after(nvMsg.$message);
+					$(`${TL.class_pagination}:last`).before(nvMsg.$message);
 
 					const evt = {
 						message: nvMsg,
@@ -583,6 +583,7 @@ class TopicLive {
 		this.class_page_fin = this.mobile ? '.right-elt > a' : '.pagi-fin-actif';
 		this.class_date = this.mobile ? '.date-post' : '.bloc-date-msg';
 		this.class_contenu = this.mobile ? '.contenu' : '.bloc-contenu';
+		this.class_pagination = this.mobile ? '.pagination-b' : '.bloc-pagi-default';
 
 		this.ajouterOptions();
 
