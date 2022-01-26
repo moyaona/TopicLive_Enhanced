@@ -8,7 +8,7 @@
 // @match https://m.jeuxvideo.com/*
 // @run-at document-end
 // @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version 5.4.1
+// @version 5.4.2
 // @grant none
 // @noframes
 // ==/UserScript==
@@ -109,6 +109,7 @@ class Page {
 					TL.nvxMessages++;
 
 					nvMsg.$message.hide();
+          nvMsg.fixAvatar();
 					nvMsg.fixBlacklist();
 					nvMsg.fixCitation();
 					nvMsg.fixDeroulerCitation();
@@ -236,6 +237,11 @@ class Message {
 		this.pseudo = $('.bloc-pseudo-msg', $message).text().replace(/[\r\n]/g, '');
 		this.supprime = false;
 	}
+  
+  fixAvatar() {
+    let avatar = this.trouver('.user-avatar-msg');
+    avatar.attr('src', avatar.data('src'));
+  }
 
 	fixBlacklist() {
 		this.trouver('.bloc-options-msg > .picto-msg-tronche, .msg-pseudo-blacklist .btn-blacklist-cancel').on('click', function () {
