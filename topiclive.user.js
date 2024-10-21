@@ -2,13 +2,13 @@
 // @name TopicLive
 // @description Charge les nouveaux messages d'un topic de JVC en direct
 // @author kiwec
-// @downloadURL https://github.com/kiwec/TopicLive/raw/master/topiclive.user.js
-// @updateURL https://github.com/kiwec/TopicLive/raw/master/topiclive.user.js
+// @downloadURL https://git.kiwec.net/kiwec/TopicLive/raw/master/topiclive.user.js
+// @updateURL https://git.kiwec.net/kiwec/TopicLive/raw/master/topiclive.user.js
 // @match https://www.jeuxvideo.com/*
 // @match https://m.jeuxvideo.com/*
 // @run-at document-end
 // @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version 5.4.2
+// @version 5.4.3
 // @grant none
 // @noframes
 // ==/UserScript==
@@ -614,7 +614,7 @@ class TopicLive {
 	// Ne sera pas initialise a chaque changement de page
 	initStatic() {
 		this.favicon = new Favicon();
-		this.son = new Audio('https://raw.githubusercontent.com/Kiwec/TopicLive/master/notification.ogg');
+		this.son = new Audio('https://git.kiwec.net/kiwec/TopicLive/raw/master/notification.ogg');
 
 		this.suivreOnglets();
 		this.init();
