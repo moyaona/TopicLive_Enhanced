@@ -10,7 +10,7 @@ Une icone s'affichera dans l'onglet en question pour indiquer le nombre de nouve
 
 - Installez ViolentMonkey ([Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag) - [Firefox](https://addons.mozilla.org/firefox/addon/violentmonkey)) ou Tampermonkey.
 
-- Installez TopicLive_Enhanced en [cliquant ici](https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced.user.js)
+- Installez TopicLive_Enhanced en [cliquant ici](https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced.user.js) (Vous obtiendrez les dernières màj automatiquement)
 
 ## Améliorations par rapport au script original
 
