@@ -6,7 +6,9 @@
 // @match https://m.jeuxvideo.com/*
 // @run-at document-end
 // @require https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @version 6.2.0
+// @downloadURL https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced.user.js
+// @updateURL https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced.user.js
+// @version 6.2.1
 // @grant none
 // @noframes
 // ==/UserScript==
