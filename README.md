@@ -12,6 +12,23 @@ Une icone s'affichera dans l'onglet en question pour indiquer le nombre de nouve
 
 - Installez TopicLive_Enhanced en [cliquant ici](https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced.user.js)
 
+## Améliorations par rapport au script original
+
+- Fix du favicon jvc qui ne s'affichait pas de suite en chargeant un topic
+- Modification esthétique du compteur de nouveaux messages en favicon
+- Ajout d'un compteur de nouveaux messages décrémentiel en favicon qui s'actualise en fonction des nouveaux messages lus
+- Ajout d'un bouton "Nouveaux Messages" sur la page qui comptabilise également le nombre de nouveaux messages et présente un compteur décrémentiel.
+Ce bouton permet d'accéder directement en scrollant au dernier message posté.
+- Fix des citations pour les nouveaux messages chargés
+
+## Améliorations envisagées
+
+- Permettre le fonctionnement du script sur toutes les pages d'un topic et pas uniquement la dernière
+- Fix le comportement sur la page MP
+- Ajout d'une box avec des options à personnaliser
+- Fix l'audio de notification
+
+
 ## Développement
 
 Si vous cherchez а̀ rendre votre userscript compatible avec TopicLive, lisez [API.md](https://git.kiwec.net/kiwec/TopicLive/src/master/API.md).
