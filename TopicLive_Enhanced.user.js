@@ -180,7 +180,7 @@ class Favicon {
         if (txt && txt !== '') {
             const radius = 70; const borderWidth = 8; const centerX = radius + borderWidth; const centerY = radius + borderWidth;
             const font = 'bold 120px Arial Black'; const verticalTextOffset = 8;
-           // this.context.beginPath(); this.context.arc(centerX, centerY, radius + borderWidth, 0, 2 * Math.PI); this.context.fillStyle = 'white'; this.context.fill();
+            this.context.beginPath(); this.context.arc(centerX, centerY, radius + borderWidth, 0, 2 * Math.PI); this.context.fillStyle = 'white'; this.context.fill();
             this.context.beginPath(); this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI); this.context.fillStyle = '#0074ff'; this.context.fill();
             this.context.shadowColor = 'rgba(0, 0, 0, 0.5)'; this.context.shadowBlur = 5; this.context.shadowOffsetX = 3; this.context.shadowOffsetY = 3;
             this.context.font = font; this.context.fillStyle = 'white'; this.context.textAlign = 'center'; this.context.textBaseline = 'middle';
