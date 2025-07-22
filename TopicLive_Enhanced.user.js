@@ -220,10 +220,10 @@ class Favicon {
             const verticalTextOffset = 8;
 
             // Dessine la bordure blanche pour la lisibilité
-            this.context.beginPath();
-            this.context.arc(centerX, centerY, radius + borderWidth, 0, 2 * Math.PI);
-            this.context.fillStyle = 'white';
-            this.context.fill();
+            //this.context.beginPath();
+            //this.context.arc(centerX, centerY, radius + borderWidth, 0, 2 * Math.PI);
+            //this.context.fillStyle = 'white';
+            //this.context.fill();
 
             // Dessine le cercle de notification bleu
             this.context.beginPath();
@@ -239,7 +239,7 @@ class Favicon {
 
             // Dessine le texte avec son ombre
             this.context.font = font;
-            this.context.fillStyle = 'black';
+            this.context.fillStyle = 'white';
             this.context.textAlign = 'center';
             this.context.textBaseline = 'middle';
             this.context.fillText(txt, centerX, centerY + verticalTextOffset);
