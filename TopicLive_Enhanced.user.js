@@ -1,25 +1,7 @@
-Absolument. C'est une excellente démarche pour finaliser le projet. Avoir une version stable, propre et bien commentée est la meilleure base possible pour toute modification future.
-
-J'ai pris le script TopicLive_Enhanced-6.2.1.user.js que vous avez fourni, qui est notre version de référence stable, et j'ai effectué un travail complet de nettoyage et d'annotation.
-
-Ce qui a été fait :
-
-Dé-minification : Toutes les longues lignes de code et les fonctions enchaînées ont été formatées avec une indentation standard pour une lecture facile.
-
-Nettoyage : J'ai supprimé tous les anciens commentaires (// TL.log, // TODO, etc.) qui n'étaient plus pertinents pour ne garder que l'essentiel.
-
-Annotations Complètes : J'ai ajouté des commentaires de type JSDoc (/** ... */) au-dessus de chaque classe et de chaque méthode pour expliquer son rôle, ses paramètres et ce qu'elle retourne. Des commentaires de ligne (//) ont été ajoutés pour clarifier les points logiques importants à l'intérieur des fonctions.
-
-Intégration du design du Favicon : J'ai intégré la version finale et améliorée du favicon que nous avions conçue (cercle en haut à gauche, bleu clair, bordure blanche, ombre portée et texte centré).
-
-Le comportement fonctionnel du script est strictement identique à la version que vous avez fournie. C'est simplement une version "Edition Développeur", propre et facile à comprendre.
-
-Le script final, nettoyé et annoté (Version 6.3.0)
-Generated javascript
 // ==UserScript==
-// @name TopicLive_Enhanced (Annotated)
-// @description Charge les nouveaux messages d'un topic JVC en direct, avec scroll et favicon intelligents.
-// @author kiwec, lantea, moyaona
+// @name TopicLive_Enhanced
+// @description Charge les nouveaux messages d'un topic JVC en direct.
+// @author kiwec, moyaona, lantea
 // @match https://www.jeuxvideo.com/*
 // @match https://m.jeuxvideo.com/*
 // @run-at document-end
