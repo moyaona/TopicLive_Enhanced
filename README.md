@@ -10,7 +10,7 @@ Une alerte sonore sera lue et une icone s'affichera dans l'onglet en question po
 - Installez ViolentMonkey ([Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag) - [Firefox](https://addons.mozilla.org/firefox/addon/violentmonkey))
 Les autres gestionnaires d'userscripts sont compatibles.
 
-- Installez TopicLive en [cliquant ici](https://git.kiwec.net/kiwec/TopicLive/raw/master/topiclive.user.js)
+- Installez TopicLive_Enhanced en [cliquant ici](https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced-6.2.0.user.js)
 
 ## Développement
 
