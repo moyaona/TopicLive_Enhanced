@@ -239,7 +239,7 @@ class Favicon {
 
             // Dessine le texte avec son ombre
             this.context.font = font;
-            this.context.fillStyle = 'white';
+            this.context.fillStyle = 'black';
             this.context.textAlign = 'center';
             this.context.textBaseline = 'middle';
             this.context.fillText(txt, centerX, centerY + verticalTextOffset);
