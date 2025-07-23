@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name          TopicLive_Enhanced_Test
+// @name          TopicLive_Enhanced
 // @description   Charge les nouveaux messages d'un topic JVC en direct.
 // @author        kiwec, moyaona, lantea
 // @match         https://www.jeuxvideo.com/*
