@@ -10,7 +10,7 @@ Une icone s'affichera dans l'onglet en question pour indiquer le nombre de nouve
 
 - Installez ViolentMonkey ou Tampermonkey.
 
-- Installez TopicLive_Enhanced en [cliquant ici]([https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced.user.js](https://github.com/moyaona/TopicLive_Enhanced/raw/refs/heads/main/TopicLive_Enhanced.user.js)) (Vous obtiendrez les dernières màj automatiquement)
+- Installez TopicLive_Enhanced en [cliquant ici](https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced.user.js) (Vous obtiendrez les dernières màj automatiquement)
 
 ## Améliorations par rapport au script original
 
