@@ -4,8 +4,8 @@
 // @author        kiwec, moyaona, lantea
 // @match         https://www.jeuxvideo.com/*
 // @match         https://m.jeuxvideo.com/*
-// @downloadURL https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced.user.js
-// @updateURL https://github.com/moyaona/TopicLive_Enhanced/raw/main/TopicLive_Enhanced.user.js
+// @downloadURL https://github.com/moyaona/TopicLive_Enhanced/raw/refs/heads/main/TopicLive_Enhanced.user.js
+// @updateURL https://github.com/moyaona/TopicLive_Enhanced/raw/refs/heads/main/TopicLive_Enhanced.user.js
 // @run-at        document-end
 // @require       https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @icon          https://image.noelshack.com/fichiers/2025/30/3/1753227153-logo-topiclive-enhanced.png
