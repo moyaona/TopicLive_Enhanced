@@ -23,6 +23,7 @@ Ce bouton permet d'accéder directement en scrollant au dernier message posté.
 - Exclusion du script des MP
 - Fix de l'audio et remplacement par une notification plus douce
 - Ajout d'options de personnalisation (activer Son, Compteur onglet, Bouton "Nouveaux Messages")
+- Ajout d'un logo pour le script
 
 ## Améliorations envisagées
 
