@@ -824,7 +824,7 @@ class TopicLive {
 
     initStatic() {
         this.favicon = new Favicon();
-        this.son = new Audio('https://github.com/moyaona/TopicLive_Enhanced/raw/refs/heads/main/notification.ogg');
+        this.son = new Audio('https://github.com/moyaona/TopicLive_Enhanced/raw/refs/heads/main/notification_sound.mp3');
         this.suivreOnglets();
         this.initScrollButton();
         this.init();
