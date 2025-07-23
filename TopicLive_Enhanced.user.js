@@ -39,11 +39,9 @@ class Page {
      */
     obtenirMessages() {
         const msgs = [];
-
         this.trouver(`${TL.class_msg}:not(.msg-pseudo-blacklist)`).each(function() {
             msgs.push(new Message($(this)));
         });
-
         return msgs;
     }
 
@@ -332,13 +330,17 @@ class TLOption {
  */
 class Message {
     constructor($message) {
-        if (TL.mobile) {
+        // La logique pour récupérer l'ID est différente sur mobile, MP, et forum.
+        if (TL.estMP) {
+            this.id_message = 'MP';
+        } else if (TL.mobile) {
             let id = $message.attr('id');
             id = id.slice(id.indexOf('_') + 1);
             this.id_message = parseInt(id, 10);
         } else {
             this.id_message = parseInt($message.attr('data-id'), 10);
         }
+
         this.date = $(TL.class_date, $message).text().replace(/[\r\n]|#[0-9]+$/g, '');
         this.edition = $message.find('.info-edition-msg').text();
         this.$message = $message;
@@ -346,67 +348,86 @@ class Message {
         this.supprime = false;
     }
 
-    // Récupère l'URL de l'avatar pour l'afficher.
     fixAvatar() {
         let avatar = this.trouver('.user-avatar-msg');
         avatar.attr('src', avatar.data('src'));
     }
 
-    // Ré-attache la fonctionnalité de "blacklistage" au bouton correspondant.
     fixBlacklist() {
         this.trouver('.bloc-options-msg > .picto-msg-tronche, .msg-pseudo-blacklist .btn-blacklist-cancel').on('click', function() {
-            // ... (code AJAX pour blacklister) ...
+            $.ajax({
+                url: '/forums/ajax_forum_blacklist.php',
+                data: {
+                    id_alias_msg: this.$message.attr('data-id-alias'),
+                    action: this.$message.attr('data-action'),
+                    ajax_hash: $('#ajax_hash_preference_user')
+                },
+                dataType: 'json',
+                success: ({ erreur }) => {
+                    if (erreur && erreur.length) {
+                        TL.alert(erreur);
+                    } else {
+                        document.location.reload();
+                    }
+                }
+            });
         });
     }
 
-    // Ré-attache la fonctionnalité de citation au bouton correspondant.
     fixCitation() {
         this.$message.find('.bloc-options-msg .picto-msg-quote').on('click', () => {
             $.ajax({
                 type: 'POST',
                 url: '/forums/ajax_citation.php',
-                // ... (données de la requête) ...
+                data: {
+                    id_message: this.id_message,
+                    ajax_timestamp: TL.ajaxTs,
+                    ajax_hash: TL.ajaxHash
+                },
+                dataType: 'json',
+                timeout: 5000,
                 success: ({ txt }) => {
                     const $msg = TL.formu.obtenirMessage();
                     let nvmsg = `> Le ${this.date} ${this.pseudo} a écrit :\n>`;
                     nvmsg += `${txt.split('\n').join('\n> ')}\n\n`;
-                    // ... (insertion du texte dans le formulaire) ...
+                    if ($msg[0].value === '') {
+                        Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value").set.call($msg[0], `${nvmsg}\n`);
+                    } else {
+                        Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value").set.call($msg[0], `${$msg[0].value}\n\n${nvmsg}`);
+                    }
+                    $msg[0].dispatchEvent(new Event("input", { bubbles: true }));
+                    $msg[0].focus();
+                    location.hash = '#forums-post-message-editor';
                 },
                 error: this.fixCitation.bind(this)
             });
         });
     }
 
-    // Ré-attache la fonctionnalité pour déplier les longues citations.
     fixDeroulerCitation() {
         this.trouver('blockquote').click(function() {
             $(this).attr('data-visible', '1');
         });
     }
 
-    // Correction spécifique à la version mobile pour afficher les messages en entier.
     fixMobile() {
         this.trouver('.message').addClass('show-all');
     }
 
-    // Raccourci pour trouver un élément à l'intérieur de ce message.
     trouver(chose) {
         return this.$message.find(chose);
     }
 
-    // Met à jour le contenu d'un message s'il a été édité.
     update(nvMessage) {
-        if (this.edition == nvMessage.edition) return; // Pas de changement.
+        if (this.edition == nvMessage.edition) return;
 
         this.edition = nvMessage.edition;
         this.trouver(TL.class_contenu).html(nvMessage.trouver(TL.class_contenu).html());
 
-        // Déclenche un événement pour signaler l'édition.
         dispatchEvent(new CustomEvent('topiclive:edition', {
             'detail': { id: this.id_message, jvcake: TL.jvCake }
         }));
 
-        // Fait flasher le message pour signaler visuellement la mise à jour.
         const defColor = this.$message.css('backgroundColor');
         this.$message.animate({ backgroundColor: '#FF9900' }, 50);
         this.$message.animate({ backgroundColor: defColor }, 500);
@@ -426,62 +447,141 @@ class Formulaire {
         this.hook();
     }
 
-    // Affiche les erreurs retournées par JVC.
     afficherErreurs(msg) {
-        // ... (logique d'affichage des erreurs) ...
+        if (typeof msg !== 'undefined') {
+            let message_erreur = '';
+            for (let i = 0; i < msg.length; i++) {
+                message_erreur += msg[i];
+                if (i < msg.length) message_erreur += '<br />';
+            }
+            TL.alert(message_erreur);
+        }
     }
 
-    // Envoie le formulaire via AJAX.
     envoyer(e) {
-        // ... (logique d'envoi du formulaire via AJAX) ...
+        if (typeof e !== 'undefined' && typeof e.errors !== 'undefined' && e.errors.length) {
+            this.afficherErreurs(e.erreurs);
+        } else {
+            this.trouver('.btn-poster-msg').attr('disabled', 'disabled');
+            this.trouver('.conteneur-editor').fadeOut();
+            window.clearTimeout(TL.idanalyse);
+            $.ajax({
+                type: 'POST',
+                url: TL.url,
+                data: this.obtenirFormulaire().serializeArray(),
+                timeout: 5000,
+                success: data => {
+                    switch (typeof data) {
+                        case 'object':
+                            if (data.hidden_reset) {
+                                this.trouver('input[type="hidden"]').remove();
+                                this.obtenirFormulaire().append(data.hidden_reset);
+                            }
+                            if (data.errors) {
+                                this.afficherErreurs(data.errors);
+                                this.trouver('.btn-poster-msg').removeAttr('disabled');
+                                this.trouver('.conteneur-editor').fadeIn();
+                            }
+                            if (data.redirect_uri) {
+                                TL.url = data.redirect_uri;
+                                TL.GET(this.verifEnvoi.bind(this));
+                            }
+                            break;
+                        case 'string':
+                            this.verifEnvoi($(data.substring(data.indexOf('<!DOCTYPE html>'))));
+                            break;
+                        case 'undefined':
+                        default:
+                            TL.alert('Erreur inconnue lors de l\'envoi du message.');
+                            this.trouver('.btn-poster-msg').removeAttr('disabled');
+                            this.trouver('.conteneur-editor').fadeIn();
+                            break;
+                    }
+                    TL.loop();
+                },
+                error: err => TL.alert(`Erreur lors de l'envoi du message : ${err}`)
+            });
+        }
     }
 
-    // "Hook" (s'accroche) au formulaire pour remplacer son comportement par défaut.
     hook() {
         const $form = this.obtenirFormulaire();
         const $bouton = $form.find('.btn-poster-msg');
-        $bouton.off(); // Retire les écouteurs d'événements de JVC.
+        $bouton.off();
         $bouton.removeAttr('data-push');
-        $bouton.attr('type', 'button'); // Empêche l'envoi classique.
-        $bouton.on('click', this.verifMessage.bind(this)); // Attache notre propre logique.
+        $bouton.attr('type', 'button');
+        $bouton.on('click', this.verifMessage.bind(this));
     }
 
-    // Met à jour le formulaire avec les nouvelles informations (captcha, tokens).
     maj($nvform) {
-        // ... (logique de mise à jour des champs cachés et du captcha) ...
-        this.hook(); // Ré-attache notre hook après la mise à jour.
+        const $form = this.obtenirFormulaire();
+        const $cap = this.obtenirCaptcha($form);
+        const $ncap = this.obtenirCaptcha($nvform);
+        this.trouver('input[type="hidden"]').remove();
+        $nvform.find('input[type="hidden"]').each(function() {
+            $form.append($(this));
+        });
+        this.trouver('.btn-poster-msg').removeAttr('disabled');
+        this.trouver('.conteneur-editor').fadeIn();
+        $cap.remove();
+        this.trouver('.jv-editor').after($ncap);
+        this.trouver('.alert-danger').remove();
+        this.trouver('.row:first').before($nvform.find('.alert-danger'));
+        this.obtenirMessage().val(this.obtenirMessage($nvform).val());
+        this.hook();
     }
 
-    // Raccourci pour obtenir le captcha.
     obtenirCaptcha($form) {
-        // ...
+        if (typeof $form === 'undefined') $form = this.obtenirFormulaire();
+        return $form.find('.jv-editor').next('div');
     }
 
-    // Raccourci pour obtenir le champ de texte du message.
     obtenirMessage($form) {
         if (typeof $form == 'undefined') $form = this.obtenirFormulaire();
-        return $form.find('#message_topic');
+        // Le sélecteur de l'input est différent pour les MPs et les forums.
+        return $form.find(TL.estMP ? '#message' : '#message_topic');
     }
 
-    // Raccourci pour obtenir l'élément du formulaire.
     obtenirFormulaire($page) {
         if (typeof $page === 'undefined') $page = $(document);
-        return $page.find('#forums-post-message-editor');
+        // Le sélecteur du formulaire est différent pour les MPs et les forums.
+        return $page.find(TL.estMP ? '#repondre-mp > form' : '#forums-post-message-editor');
     }
 
-    // Vérifie que le message est valide avant de l'envoyer.
+    verifEnvoi(data) {
+        const nvPage = new Page(data);
+        const $formu = this.obtenirFormulaire(nvPage.$page);
+        this.maj($formu);
+        TL.majUrl(nvPage);
+        nvPage.scan();
+    }
+
     verifMessage() {
-        $.ajax({
-            type: 'POST',
-            url: '/forums/ajax_check_poste_message.php',
-            // ... (données de vérification) ...
-            success: this.envoyer.bind(this),
-            error: this.verifMessage.bind(this)
-        });
+        // La vérification AJAX n'existe pas pour les MPs, on envoie directement.
+        if (TL.estMP) {
+            this.envoyer();
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/forums/ajax_check_poste_message.php',
+                data: {
+                    id_topic,
+                    new_message: this.obtenirMessage().val(),
+                    ajax_timestamp: TL.ajaxTs,
+                    ajax_hash: TL.ajaxHash
+                },
+                dataType: 'json',
+                timeout: 5000,
+                success: this.envoyer.bind(this),
+                error: this.verifMessage.bind(this)
+            });
+        }
         return false;
     }
 
-    // ... (Autres méthodes de la classe Formulaire) ...
+    trouver(chose) {
+        return this.obtenirFormulaire().find(chose);
+    }
 }
 
 
@@ -516,7 +616,6 @@ class Favicon {
         }
     }
 
-    // Efface le canvas.
     clear() {
         this.context.clearRect(0, 0, this.canv.width, this.canv.height);
         if (this.imageLoaded) {
@@ -524,7 +623,6 @@ class Favicon {
         }
     }
 
-    // Met à jour le favicon avec le texte du compteur.
     maj(txt) {
         this.pendingText = txt;
         if (!this.imageLoaded) {
@@ -568,7 +666,6 @@ class Favicon {
         this.replace();
     }
 
-    // Remplace le favicon existant de la page par notre version sur canvas.
     replace() {
         $('link[rel*="icon"]').remove();
         this.lien = $('<link>', {
@@ -596,7 +693,6 @@ class TopicLive {
         this.unreadMessageAnchors = [];
     }
 
-    // Ajoute les options personnalisables au menu de JVC.
     ajouterOptions() {
         if (this.mobile) return;
         this.options = {
@@ -606,25 +702,41 @@ class TopicLive {
         };
     }
 
-    // Charge les nouvelles données de la page.
     charger() {
-        if (this.oldInstance != this.instance) return;
-        TL.GET(data => { new Page(data).scan(); });
+        if (this.oldInstance != this.instance) {
+            return;
+        }
+        TL.GET(data => {
+            new Page(data).scan();
+        });
     }
 
-    // Initialise le script pour la page courante.
     init() {
-        if (typeof $ === 'undefined') return;
+        if (typeof $ === 'undefined') {
+            return;
+        }
+
         this.instance++;
         this.ajaxTs = $('#ajax_timestamp_liste_messages').val();
         this.ajaxHash = $('#ajax_hash_liste_messages').val();
-        this.url = document.URL;
+
+        // On détermine si on est sur une page de MP pour adapter la logique.
+        this.estMP = $('.mp-page').length > 0;
+        // L'URL de rafraîchissement des MPs est différente.
+        this.url = this.estMP ? document.URL.substring(0, document.URL.indexOf('&')) : document.URL;
+
         this.mobile = document.URL.includes('//m.jeuxvideo.com');
         this.class_msg = this.mobile ? '.post' : '.bloc-message-forum';
-        // ... (définition des autres classes CSS) ...
+        this.class_num_page = this.mobile ? '.num-page' : '.page-active';
+        this.class_page_fin = this.mobile ? '.right-elt > a' : '.pagi-fin-actif';
+        this.class_date = this.mobile ? '.date-post' : '.bloc-date-msg';
+        this.class_contenu = this.mobile ? '.contenu' : '.bloc-contenu';
+        this.class_pagination = this.mobile ? '.pagination-b' : '.bloc-pagi-default';
         this.ajouterOptions();
 
-        const analysable = document.URL.match(/\/forums\/\d/);
+        // Le script ne doit s'activer que sur les pages de forum ou de conversation MP.
+        const analysable = (document.URL.match(/\/forums\/\d/) || document.URL.match(/\/messages-prives\//));
+
         if (analysable && $(this.class_msg).length > 0) {
             console.log('[TopicLive] Script actif sur cette page.');
             this.page = new Page($(document));
@@ -638,12 +750,35 @@ class TopicLive {
         }
     }
 
-    // Initialise le bouton de scroll vers les nouveaux messages.
     initScrollButton() {
-        // ... (injection du CSS et de l'élément bouton) ...
+        const buttonCss = ` #topiclive-scroll-button { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); display: none; transition: opacity 0.3s; } #topiclive-scroll-button:hover { background-color: #0056b3; } `;
+        $('head').append(`<style>${buttonCss}</style>`);
+        this.$scrollButton = $('<button id="topiclive-scroll-button">↓ Nouveaux messages</button>');
+        $('body').append(this.$scrollButton);
+        this.$scrollButton.on('click', () => {
+            this.page.performScroll();
+        });
+
+        $(window).on('scroll', () => {
+            if (this.unreadMessageAnchors.length === 0) {
+                return;
+            }
+            const viewportBottom = $(window).scrollTop() + $(window).height();
+            const messagesJustRead = [];
+            for (const $message of this.unreadMessageAnchors) {
+                const messageBottom = $message.offset().top + $message.outerHeight();
+                if (viewportBottom >= messageBottom) {
+                    messagesJustRead.push($message);
+                }
+            }
+            if (messagesJustRead.length > 0) {
+                this.unreadMessageAnchors = this.unreadMessageAnchors.filter($anchor => !messagesJustRead.some($read => $read.is($anchor)));
+                this.nvxMessages -= messagesJustRead.length;
+                this.updateCounters();
+            }
+        });
     }
 
-    // Met à jour les compteurs (favicon, bouton de scroll).
     updateCounters() {
         let countText = '';
         if (this.nvxMessages > 0) {
@@ -665,40 +800,84 @@ class TopicLive {
         }
     }
 
-    // Initialise les composants statiques et globaux du script (une seule fois).
+    markAllAsRead() {
+        this.nvxMessages = 0;
+        this.unreadMessageAnchors = [];
+        this.updateCounters();
+    }
+
+    showScrollButton(count) {
+        if (!this.options.optionScrollButton.actif) {
+            return;
+        }
+        const message = count > 1 ? `↓ ${count} Nouveaux messages` : '↓ Nouveau message';
+        this.$scrollButton.text(message).fadeIn();
+    }
+
+    hideScrollButton() {
+        this.$scrollButton.fadeOut();
+    }
+
+    addUnreadAnchor($message) {
+        this.unreadMessageAnchors.push($message);
+    }
+
     initStatic() {
         this.favicon = new Favicon();
         this.son = new Audio('https://github.com/moyaona/TopicLive_Enhanced/raw/refs/heads/main/notification.ogg');
         this.suivreOnglets();
         this.initScrollButton();
         this.init();
-
-        // Écoute les changements d'options pour réagir instantanément.
-        addEventListener('topiclive:optionchanged', (e) => {
-            const { id, actif } = e.detail;
-            if (id === 'topiclive_favicon' && !actif) this.favicon.maj('');
-            if (id === 'topiclive_scrollbutton' && !actif) this.hideScrollButton();
-        });
-
-        // Écoute l'événement de JVC pour se ré-initialiser lors d'une navigation "instantanée".
         addEventListener('instantclick:newpage', this.init.bind(this));
 
-        // Injecte les styles CSS nécessaires au fonctionnement visuel.
+        addEventListener('topiclive:optionchanged', (e) => {
+            const { id, actif } = e.detail;
+            if (id === 'topiclive_favicon' && !actif) {
+                this.favicon.maj('');
+            }
+            if (id === 'topiclive_scrollbutton' && !actif) {
+                this.hideScrollButton();
+            }
+        });
+
         $("head").append(`
             <style type='text/css'>
-                /* ... (styles pour l'indicateur de chargement et l'alignement des options) ... */
+                .topiclive-loading:after { content: ' ○' }
+                .topiclive-loaded:after { content: ' ●' }
+                .menu-user-forum li:has(input[id^="topiclive_"]) {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
             </style>
         `);
-
         console.log('[TopicLive] Initialisation terminée.');
     }
 
-    // Décode les liens "JvCare".
     jvCake(classe) {
-        // ... (logique de décodage) ...
+        const base16 = '0A12B34C56D78E9F';
+        let lien = '';
+        const s = classe.split(' ')[1];
+        for (let i = 0; i < s.length; i += 2) {
+            lien += String.fromCharCode(base16.indexOf(s.charAt(i)) * 16 + base16.indexOf(s.charAt(i + 1)));
+        }
+        return lien;
     }
 
-    // Gère la boucle de rafraîchissement automatique.
+    alert(message) {
+        try {
+            modal('erreur', { message });
+            console.error(`[TopicLive] ${message}`);
+        } catch (err) {
+            console.error(`[TopicLive] Alerte : ${message}`);
+            alert(message);
+        }
+    }
+
+    log(message) {
+        console.log(`[TopicLive] ${message}`);
+    }
+
     loop() {
         if (typeof this.idanalyse !== 'undefined') window.clearTimeout(this.idanalyse);
         let duree = this.ongletActif ? 5000 : 10000;
@@ -707,19 +886,58 @@ class TopicLive {
         this.idanalyse = setTimeout(this.charger.bind(this), duree);
     }
 
-    // Détecte si l'onglet du navigateur est actif ou en arrière-plan.
+    majUrl(page) {
+        // La gestion d'URL est spécifique aux forums.
+        if (this.estMP) return;
+
+        const $bouton = page.trouver(this.class_page_fin);
+        const numPage = page.trouver(`${this.class_num_page}:first`).text();
+        const testUrl = this.url.split('-');
+        if ($bouton.length > 0) {
+            this.messages = [];
+            if ($bouton.prop('tagName') == 'A') {
+                this.url = $bouton.attr('href');
+            } else {
+                this.url = this.jvCake($bouton.attr('class'));
+            }
+        } else if (testUrl[3] != numPage) {
+            this.messages = [];
+            testUrl[3] = numPage;
+            this.url = testUrl.join('-');
+        }
+    }
+
     suivreOnglets() {
         document.addEventListener('visibilitychange', () => {
             this.ongletActif = !document.hidden;
         });
     }
 
-    // Fonction utilitaire pour effectuer une requête GET.
     GET(cb) {
-        // ... (logique de la requête AJAX avec indicateur de chargement) ...
+        const blocChargement = this.mobile ? $('.bloc-nom-sujet:last > span') : $('#bloc-formulaire-forum .titre-bloc');
+        blocChargement.addClass('topiclive-loading');
+        window.clearTimeout(this.idanalyse);
+        $.ajax({
+            type: 'GET',
+            url: this.url,
+            timeout: 5000,
+            success: data => {
+                if (this.oldInstance != this.instance) {
+                    return;
+                }
+                blocChargement.removeClass('topiclive-loading');
+                blocChargement.addClass('topiclive-loaded');
+                cb($(data.substring(data.indexOf('<!DOCTYPE html>'))));
+                setTimeout(() => {
+                    blocChargement.removeClass('topiclive-loaded');
+                }, 100);
+                TL.loop();
+            },
+            error: () => {
+                TL.loop();
+            }
+        });
     }
-
-    // ... (Autres méthodes de la classe TopicLive) ...
 }
 
 
