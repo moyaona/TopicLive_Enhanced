@@ -20,13 +20,14 @@ Une icone s'affichera dans l'onglet en question pour indiquer le nombre de nouve
 - Ajout d'un bouton "Nouveaux Messages" sur la page qui comptabilise également le nombre de nouveaux messages et présente un compteur décrémentiel.
 Ce bouton permet d'accéder directement en scrollant au dernier message posté.
 - Fix des citations pour les nouveaux messages chargés
+- Exclusion du script des MP
+- Fix de l'audio et remplacement par une notification plus douce
+- Ajout d'options de personnalisation (activer Son, Compteur onglet, Bouton "Nouveaux Messages")
 
 ## Améliorations envisagées
 
 - Permettre le fonctionnement du script sur toutes les pages d'un topic et pas uniquement la dernière
-- Fix le comportement sur la page MP
-- Ajout d'une box avec des options à personnaliser
-- Fix l'audio de notification
+- Faire fonctionner le script pour l'actualisation des MP
 
 
 ## Développement
