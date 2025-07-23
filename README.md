@@ -18,7 +18,7 @@ Une icone s'affichera dans l'onglet en question pour indiquer le nombre de nouve
 - Modification esthétique du compteur de nouveaux messages en favicon
 - Ajout d'un compteur de nouveaux messages décrémentiel en favicon qui s'actualise en fonction des nouveaux messages lus
 - Ajout d'un bouton "Nouveaux Messages" sur la page qui comptabilise également le nombre de nouveaux messages et présente un compteur décrémentiel.
-Ce bouton permet d'accéder directement en scrollant au dernier message posté.
+Ce bouton permet d'accéder directement en scrollant aux derniers messages postés.
 - Fix des citations pour les nouveaux messages chargés
 - Exclusion du script des MP
 - Fix de l'audio et remplacement par une notification plus douce
