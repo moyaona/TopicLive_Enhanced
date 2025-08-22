@@ -30,8 +30,7 @@ Ce bouton permet d'accéder directement en scrollant aux derniers messages post�
 - Permettre le fonctionnement du script sur toutes les pages d'un topic et pas uniquement la dernière
 - Faire fonctionner le script pour l'actualisation des MP
 
-
-## Développement
-
-Si vous cherchez а̀ rendre votre userscript compatible avec TopicLive, lisez [API.md](https://git.kiwec.net/kiwec/TopicLive/src/master/API.md).
-Si vous souhaitez contribuer а̀ TopicLive, conservez le style actuel (tabulations pour l'indentation...), c'est tout !
+## Crédits
+Kiwec pour la base du script
+Lantea / Atlantis pour la partie citations
+Moyaona pour la reprise du script
