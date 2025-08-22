@@ -31,6 +31,6 @@ Ce bouton permet d'accéder directement en scrollant aux derniers messages post�
 - Faire fonctionner le script pour l'actualisation des MP
 
 ## Crédits
-Kiwec pour la base du script
-Lantea / Atlantis pour la partie citations
-Moyaona pour la reprise du script
+- Kiwec : base du script
+- Lantea (github) / Atlantis (jvscript) : partie citations
+- Moyaona : refondation du script
