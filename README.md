@@ -14,11 +14,12 @@ Une icone s'affichera dans l'onglet en question pour indiquer le nombre de nouve
 
 ## Améliorations par rapport au script original
 
+- Refondation du système de chargement automatique des messages : un mode chat qui fait défiler les messages automatiquemement, un mode lecture qui charge les nouveaux messages sans défilement auto (façon discord)
+- En mode lecture : Ajout d'un bouton "Nouveaux Messages" sur la page qui comptabilise le nombre de nouveaux messages et présente un compteur décrémentiel. Ce bouton permet d'accéder directement en scrollant aux derniers messages postés.
+En l'absence de nouveaux messages s'affichera un bouton "Revenir au direct" qui permet de repasser en mode chat.
 - Fix du favicon jvc qui ne s'affichait pas de suite en chargeant un topic
 - Modification esthétique du compteur de nouveaux messages en favicon
 - Ajout d'un compteur de nouveaux messages décrémentiel en favicon qui s'actualise en fonction des nouveaux messages lus
-- Ajout d'un bouton "Nouveaux Messages" sur la page qui comptabilise également le nombre de nouveaux messages et présente un compteur décrémentiel.
-Ce bouton permet d'accéder directement en scrollant aux derniers messages postés.
 - Fix des citations pour les nouveaux messages chargés
 - Exclusion du script des MP
 - Fix de l'audio et remplacement par une notification plus douce
